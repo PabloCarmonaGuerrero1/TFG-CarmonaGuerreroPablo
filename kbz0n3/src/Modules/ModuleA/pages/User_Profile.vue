@@ -309,78 +309,83 @@ export default {
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
-.profile-page{
+
+/*  General Layout  */
+.profile-page {
   min-height: 80vh;
   display: flex;
+  justify-content: space-around;
   margin-top: 6rem;
   margin-bottom: 8rem;
-  justify-content: space-around;
+  font-family: "Keania One", sans-serif;
 }
-.profile-user-favs{
+
+/*  User Favorites  */
+.profile-user-favs {
   width: 25%;
   height: 40rem;
   padding: 1rem;
   border-radius: 1rem;
   text-align: center;
   background-color: #D9D9D9;
-  font-family: "Keania One", sans-serif;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.profile-form-infoupdate{
+
+/*  Form Info Update  */
+.profile-form-infoupdate {
   width: 100%;
   height: 35rem;
   padding: 1rem;
   border-radius: 1rem;
-  text-align: center;
   background-color: #D9D9D9;
-  font-family: "Keania One", sans-serif;
+  text-align: center;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
 }
-.profile-form-infoupdate input{
-  width: 12rem;
-  font-family: "Keania One", sans-serif;
-  padding: 0.5rem;
-  border: 0.2rem solid #000000;
-  border-radius: 0.3rem;
+
+.profile-form-infoupdate p {
+  font-size: 1.5rem;
 }
-.form-row{
+
+.profile-form-infoupdate input {
+  height: 0.5rem;
+  width: 15rem;
+  padding: 1rem;
+  margin: 0.5rem;
+  border: none;
+  border-radius: 0.9375rem;
+  text-align: center;
+  font-size: 1rem;
+  font-family: "Keania One", sans-serif;
+}
+
+/*  Form Row  */
+.form-row {
   display: flex;
   gap: 2rem;
   justify-content: center;
   width: 100%;
 }
-.profile-form-infoupdate p{
-  font-size: 1.5rem;
-}
-.profile-form-infoupdate input{
-  height: 0.5rem;
-  width: 15rem;
-  padding: 1rem; 
-  margin: 0.5rem;
-  border: none;
-  border-radius: 0.9375rem; 
-  text-align: center;
-  font-size: 1rem; 
-  font-family: "Keania One", sans-serif;
-}
-.profile-bottons{
+
+/*  Buttons  */
+.profile-bottons {
   display: flex;
   justify-content: center;
   align-items: center;
 }
-.profile-bottons button{
-  width: 12rem; 
-  height: 3.125rem; 
-  font-size: 1rem; 
+
+.profile-bottons button {
+  width: 12rem;
+  height: 3.125rem;
+  font-size: 1rem;
   margin: 1rem;
   border: none;
-  border-radius: 1.875rem; 
+  border-radius: 1.875rem;
   font-family: "Keania One", sans-serif;
   cursor: pointer;
   text-align: center;
@@ -388,35 +393,43 @@ export default {
   align-items: center;
   justify-content: center;
   white-space: nowrap;
-  padding: 0.625rem 0; 
+  padding: 0.625rem 0;
   background-color: #00aaff;
   color: black;
 }
-.profile-botton-update:hover{
+
+.profile-botton-update:hover {
   background-color: #0000ff;
   color: white;
 }
-.profile-botton-logout:hover{
+
+.profile-botton-logout:hover {
   background-color: rgb(168, 0, 0);
   color: white;
 }
-.profile-product-image{
+
+/*  Product Image  */
+.profile-product-image {
   height: 12rem;
   width: 12rem;
-  margin-top:2rem;
+  margin-top: 2rem;
   object-fit: cover;
   border-radius: 1rem;
   border: 0.2rem solid black;
 }
-.profile-error{
+
+/*  Error Message  */
+.profile-error {
   width: 15rem;
   font-size: 1rem;
   color: rgb(168, 0, 0);
   text-align: center;
-  margin-top: 0.5rem; 
+  margin-top: 0.5rem;
   word-wrap: break-word;
-  overflow-wrap: break-word; 
+  overflow-wrap: break-word;
 }
+
+/*  Notification  */
 .notification {
   position: fixed;
   top: 20px;
@@ -433,10 +446,13 @@ export default {
   color: white;
 }
 
-.notification.error,.notification.logout {
+.notification.error,
+.notification.logout {
   background-color: #f44336;
   color: white;
 }
+
+/* Responsive  */
 @media (max-width: 1024px) {
   .profile-page {
     flex-direction: column;
@@ -527,3 +543,4 @@ export default {
   }
 }
 </style>
+

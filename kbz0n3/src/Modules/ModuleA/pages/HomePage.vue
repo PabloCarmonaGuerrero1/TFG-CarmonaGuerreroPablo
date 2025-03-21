@@ -415,8 +415,11 @@ export default {
   border-radius: 1rem;
   border: 0.2rem solid black;
 }
-
-.product-card img {
+.homepage-cart-image {
+  width: 2rem;  
+  height: 2rem; 
+}
+.homepage-image-product{
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -492,7 +495,7 @@ export default {
   .homepage-filter-input { width: 90vw; }
   .results { grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr)); }
   .homepage-product-button { width: 40vw; height: 2.5rem; font-size: 0.8rem; }
-  .product-card { max-width: 100%; }
+  .homepage-image-product { max-width: 100%; }
   .homepage-button, .homepage-pagination-button { width: 40vw; font-size: 0.9rem; }
   .homepage-product-imagecart { height: 8rem; width: 8rem; }
 }

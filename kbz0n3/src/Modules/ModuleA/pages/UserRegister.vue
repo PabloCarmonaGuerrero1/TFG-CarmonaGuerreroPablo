@@ -233,6 +233,7 @@ export default {
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
 
+/*  Layout General  */
 .Register {
   display: flex;
   align-items: center;
@@ -241,6 +242,7 @@ export default {
   font-family: "Keania One", sans-serif;
 }
 
+/*  Imágenes  */
 .Register img {
   width: 18rem;
   height: 18rem;
@@ -260,6 +262,7 @@ export default {
   margin-right: 10rem;
 }
 
+/*  Título del Formulario  */
 .registerpage-title {
   display: flex;
   justify-content: center;
@@ -269,6 +272,7 @@ export default {
   padding: 1rem;
 }
 
+/*  Contenedor Inputs  */
 .register-inputs-container {
   display: flex;
   flex-direction: column;
@@ -291,6 +295,7 @@ export default {
   width: 45%;
 }
 
+/*  Inputs  */
 .register-titleform {
   font-size: 1.4rem;
   font-weight: bold;
@@ -307,8 +312,10 @@ export default {
   background: rgba(0, 0, 0, 0.1);
   text-align: center;
   font-size: 1rem;
+  font-family: "Keania One", sans-serif;
 }
 
+/*  Botones  */
 .register-buttons {
   display: flex;
   justify-content: center;
@@ -335,6 +342,7 @@ export default {
   color: black;
 }
 
+/*  Mensaje de Error  */
 .error {
   width: 15rem;
   min-height: 1.2rem;
@@ -345,6 +353,7 @@ export default {
   overflow-wrap: break-word;
 }
 
+/*  Responsive  */
 @media (max-width: 768px) {
   .Register {
     flex-direction: column;
@@ -356,7 +365,7 @@ export default {
 
   .register-images-leftside,
   .register-images-rightside {
-    display: none; 
+    display: none;
   }
 
   .register-row {
@@ -367,5 +376,5 @@ export default {
     width: 100%;
   }
 }
-
 </style>
+

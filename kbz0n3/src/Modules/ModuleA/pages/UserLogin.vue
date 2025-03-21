@@ -111,14 +111,17 @@ export default {
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
 
+/*  Layout Principal  */
 .Login {
   height: 98vh;
   display: flex;
   align-items: center;
   justify-content: space-between;
   flex-wrap: wrap;
+  font-family: "Keania One", sans-serif;
 }
 
+/*  Imágenes  */
 .Login img {
   width: 18rem;
   height: 18rem;
@@ -138,14 +141,23 @@ export default {
   margin-right: 15rem;
 }
 
+/*  Formulario de Login  */
 .Login-form {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  font-family: "Keania One", sans-serif;
 }
 
+/*  Título del Formulario  */
+.login-titleform {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+/*  Input Container  */
 .login-input-container {
   width: 80%;
   max-width: 18.75rem;
@@ -155,13 +167,7 @@ export default {
   align-items: center;
 }
 
-.login-titleform {
-  font-size: 2rem;
-  font-weight: bold;
-  margin-bottom: 0.5rem;
-  text-align: center;
-}
-
+/*  Inputs  */
 .login-input {
   width: 25rem;
   height: 3rem;
@@ -174,6 +180,7 @@ export default {
   font-family: "Keania One", sans-serif;
 }
 
+/*  Botones  */
 .login-buttons {
   width: 80%;
   display: flex;
@@ -187,9 +194,9 @@ export default {
 }
 
 .btn {
-  width: 12rem; 
+  width: 12rem;
   min-width: 12rem;
-  height: 3.125rem; 
+  height: 3.125rem;
   font-size: 1.2rem;
   border: none;
   border-radius: 1.875rem;
@@ -199,7 +206,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  white-space: nowrap; 
+  white-space: nowrap;
   padding: 10px 0;
 }
 
@@ -213,7 +220,7 @@ export default {
   color: white;
 }
 
-/* Enlace de registro */
+/*  Enlace Registro y Error  */
 .login-goregister {
   margin-top: 1rem;
   font-size: 0.9rem;
@@ -227,6 +234,7 @@ export default {
   margin-top: 0.5rem;
 }
 
+/*  Responsive  */
 @media (max-width: 1024px) {
   .Login {
     flex-direction: column;
@@ -286,3 +294,4 @@ export default {
   }
 }
 </style>
+

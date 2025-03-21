@@ -292,169 +292,212 @@ export default {
 </script>
   
 
-<style >
+<style>
 @import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
-.shoppingcart-page{
+
+/* Página principal del carrito */
+.shoppingcart-page {
   font-family: "Keania One", sans-serif;
-  margin-top: 8rem;
+  margin: 8rem 0;
   min-height: 100vh;
-  margin-bottom: 8rem;
 }
-  h2 {
-    color: #333;
-    text-align: center;
-  }
-  
-  .shoppingcart-columns {
-    display: flex;
-    justify-content: space-around;
-    margin-top: 20px;
-    text-align: center;
-    flex-grow: 1;
-  }
-  .shoppingcart-button-confirm {
+
+/* Títulos */
+h2 {
+  color: #333;
+  text-align: center;
+}
+
+/* Columnas principales */
+.shoppingcart-columns {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  text-align: center;
+  flex-grow: 1;
+}
+
+/* Columnas individuales */
+.shoppingcart-column {
+  width: 35%;
+  padding: 10px;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.shoppingcart-column h3 {
+  text-align: center;
+}
+
+/* Tarjetas de comida/bebida */
+.shoppingcart-food,
+.shoppingcart-drink {
+  min-height: 40rem;
+  width: 30rem;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  background-color: #D9D9D9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Imagen del producto */
+.shoppingcart-product-image {
+  height: 5rem;
+  width: 5rem;
+  margin: 1rem;
+  object-fit: cover;
+  border-radius: 1rem;
+  border: 0.2rem solid black;
+}
+
+/* Lista de productos */
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 10px 0;
+  padding: 10px;
+  background: #f4f4f4;
+  border-radius: 5px;
+}
+
+/* Controles de cantidad */
+.shoppingcart-quantity-controls {
+  display: flex;
+  align-items: center;
+}
+
+.shoppingcart-quantity-input {
+  width: 3rem;
+  text-align: center;
+  padding: 0.3rem;
+  margin: 0 10px;
+  border-radius: 0.4rem;
+  font-family: "Keania One", sans-serif;
+}
+
+.shoppingcart-button-quantity {
+  cursor: pointer;
+  padding: 5px 10px;
+  background-color: #D9D9D9;
+  border: none;
+  border-radius: 5px;
+  margin-top: 10px;
+}
+
+/* Botones de acción */
+.button-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.shoppingcart-button-confirm {
   display: flex;
   justify-content: center;
   align-items: center;
-  text-align: center;
   width: 20rem;
   margin-top: 20px;
   padding: 10px;
-  background-color: #4CAF50; 
-  color: rgb(0, 0, 0);
+  background-color: #4CAF50;
+  color: black;
   border: none;
   font-size: 16px;
   cursor: pointer;
-  text-align: center;
   border-radius: 5px;
   font-family: "Keania One", sans-serif;
 }
-.button-container {
-  display: flex;
-  justify-content: center; 
-  margin-top: 20px;          
-}
+
 .shoppingcart-button-confirm:hover {
   background-color: #45a049;
 }
 
-  .shoppingcart-column {
-    width: 35%; 
-    padding: 10px;
-    box-sizing: border-box; 
-    position: relative;
-  }
-  .shoppingcart-column h3 {
-  text-align: center; 
+.shoppingcart-button-pagination,
+.shoppingcart-button-clean {
+  margin: auto 1rem;
+  background-color: #00E5FF;
+  color: black;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-family: "Keania One", sans-serif;
 }
-  .shoppingcart-food, .shoppingcart-drink {
-    min-height: 40rem;
-    width: 100%; 
-    width: 30rem;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    padding: 10px;
-    background-color: #D9D9D9;
-    display: flex;
-    flex-direction: column;
-    text-align: center;
-    align-items: center;
-  } 
-  .shoppingcart-quantity-controls {
-    display: flex;
-    align-items: center;
-  }
-  .shoppingcart-total-container {
-    text-align: center;
-    margin-top: 20px;
-  }
-  .shoppingcart-quantity-input {
-    width: 50px;
-    text-align: center;
-    margin: 0 10px;
-  }
-  
-  .shoppingcart-button-quantity{
-    cursor: pointer;
-    padding: 5px 10px;
-    background-color: #D9D9D9;
-    border: none;
-    border-radius: 5px;
-    margin-top: 10px;
-  }
-  
-  .shoppingcart-delete-btn {
-    background-color: #dc3545;
-    font-family: "Keania One", sans-serif;
-    border-radius: 0.3rem;
-  }
-  
-  .shoppingcart-clear-btn {
-    background-color: #28a745;
-    margin-top: 10px;
-  }
-  
-  ul {
-    list-style-type: none;
-    padding: 0;
-  }
-  
-  li {
-    display: flex;
-    align-items: center;
-    justify-content: center ;
-    margin: 10px 0;
-    padding: 10px;
-    background: #f4f4f4;
-    border-radius: 5px;
-  }
-  
-  strong {
-    font-size: 1.2em;
-  }
-  
-  p {
-    margin: 5px 0;
-  }
-  
-  .shoppingcart-total {
-    margin-top: 20px;
-    font-size: 1.2em;
-    font-weight: bold;
-    text-align: center;
-  }
-  .shoppingcart-product-image{   
-    height: 5rem;
-    width: 5rem;
-    margin: 1rem;
-    object-fit: cover;
-    border-radius: 1rem;
-    border: 0.2rem solid black;
 
-  }
+.shoppingcart-button-clean:hover {
+  background-color: #019bac;
+}
+
+/* Botones específicos */
+.shoppingcart-delete-btn {
+  background-color: #dc3545;
+  font-family: "Keania One", sans-serif;
+  border-radius: 0.3rem;
+}
+
+.shoppingcart-clear-btn {
+  background-color: #28a745;
+  margin-top: 10px;
+}
+
+/* Totales */
+.shoppingcart-total-container,
+.shoppingcart-total {
+  text-align: center;
+  margin-top: 20px;
+}
+
+.shoppingcart-total {
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+/* Texto general */
+strong {
+  font-size: 1.2em;
+}
+
+p {
+  margin: 5px 0;
+}
+
+/* Popup de confirmación */
 .shoppingcart-popup-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-family: "Keania One", sans-serif;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: "Keania One", sans-serif;
 }
+
 .shoppingcart-popup-overlay button {
-    font-family: "Keania One", sans-serif;
-    border-radius: 1rem;
-    margin: 1rem;
-    height: 2rem;
-    width: 5rem;
+  font-family: "Keania One", sans-serif;
+  border-radius: 1rem;
+  margin: 1rem;
+  height: 2rem;
+  width: 5rem;
 }
+
 .shoppingcart-popup-overlay input {
   font-family: "Keania One", sans-serif;
   border-radius: 1rem;
 }
+
 .shoppingcart-popup-content {
   background-color: #D9D9D9;
   padding: 40px;
@@ -470,29 +513,8 @@ export default {
   border: 1px solid #ccc;
   border-radius: 5px;
 }
-.shoppingcart-quantity-input{
-  width: 3rem;
-  text-align: center;
-  padding: 0.3rem;
-  border-radius: 0.4rem;
-  font-family: "Keania One", sans-serif;
-}
-.shoppingcart-button-pagination, .shoppingcart-button-clean{
-  margin-top: auto;
-  margin-left: 1rem;
-  margin-right: 1rem;
-  background-color: #00E5FF;
-  color: black;
-  border: none;
-  padding: 0.5rem 1rem;
-  border-radius: 0.3rem;
-  cursor: pointer;
-  font-size: 1rem;
-  font-family: "Keania One", sans-serif;
-}
-.shoppingcart-button-clean:hover{
-  background-color: #019bac;
-}
+
+/* Notificaciones */
 .notification {
   width: 10rem;
   position: fixed;
@@ -510,10 +532,12 @@ export default {
   color: black;
 }
 
-.notification.delete{
+.notification.delete {
   background-color: #f44336;
   color: white;
 }
+
+/* Responsive */
 @media screen and (max-width: 768px) {
   .shoppingcart-columns {
     flex-direction: column;
@@ -560,6 +584,7 @@ export default {
   }
 }
 </style>
+
   
   
   

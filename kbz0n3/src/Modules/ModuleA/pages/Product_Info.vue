@@ -291,7 +291,6 @@ export default {
 * {
     margin: 0;
     padding: 0;
-    box-sizing: border-box;
 }
 
 
@@ -340,6 +339,7 @@ export default {
     border-radius: 1rem;
     cursor: pointer;
     transition: background-color 0.3s ease;
+    font-family: "Keania One", sans-serif;
 }
 
 .productinfo-btn-favorite.favorite {
@@ -363,8 +363,11 @@ export default {
 .productinfo-quantity-input,
 .productinfo-btn-add,
 .productinfo-btn-remove {
+    width: 5rem;
     height: 2rem;
     border-radius: 1rem;
+    margin: 1rem;
+    font-family: "Keania One", sans-serif;
 }
 
 .productinfo-btn-quantity,
@@ -405,9 +408,9 @@ export default {
 
 .productinfo-titlename h2 {
     width: 40rem;
-    height: 2.5rem;
+    height: 4rem;
     font-size: 2rem;
-    margin-bottom: 1rem;
+    margin-bottom: 3rem;
     padding: 1rem;
     background-color: #D9D9D9;
     border-radius: 1rem;
