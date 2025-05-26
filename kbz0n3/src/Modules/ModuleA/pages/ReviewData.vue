@@ -135,6 +135,7 @@ body {
   padding: 1rem;
   border-radius: 1rem;
   margin: 1rem;
+  font-family: "Keania One", sans-serif;
 }
 
 /* Botones */
@@ -143,6 +144,7 @@ body {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  
 }
 
 .reviewsdata-buttons {
@@ -152,6 +154,7 @@ body {
   align-items: center;
   gap: 10px;
   margin-top: 1rem;
+  font-family: "Keania One", sans-serif;
 }
 
 /* Tarjetas de reseñas */

@@ -16,21 +16,20 @@
 @import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
 
 .Footer {
-  position: fixed; 
-  bottom: 0; 
-  left: 0; 
-  background-color: #0077FF; 
-  padding: 0.5rem; 
-  display: flex; 
-  justify-content: space-between; 
-  align-items: center; 
-  width: 100%;
-  font-family: "Keania One", sans-serif;
+  background-color: #0077FF;
+  padding: 0.5rem 1rem; /* margen interno */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;  /* ancho completo de la ventana */
   box-sizing: border-box;
+  font-family: "Keania One", sans-serif;
+  margin-top: auto;
 }
 
+
 .Footer .copyright {
-  font-size: 1.2rem;
+  font-size: 1rem;
   padding-right: 1.5rem;
 }
 
@@ -42,8 +41,8 @@
 }
 
 .Footer img {
-  width: 5vh;
-  height: 5vh;
+  width: 3vh;
+  height: 3vh;
 }
 
 @media (max-width: 768px) {

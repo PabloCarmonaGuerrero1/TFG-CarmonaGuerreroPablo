@@ -14,6 +14,7 @@ const routes = [
             { path: "reviewpage", component: () => import("../pages/ReviewPage.vue") },
             { path: "profile", component: () => import("../pages/User_Profile.vue") },
             { path: "shoppingcart", component: () => import("../pages/ShoppingCart.vue") },
+            { path: "adminedits", component: () => import("../pages/AdminEdits.vue") },         
             { path: '/:pathMatch(.*)*', component: () => import("../pages/NotFound.vue") 
             }
             

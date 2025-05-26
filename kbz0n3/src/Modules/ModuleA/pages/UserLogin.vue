@@ -216,8 +216,8 @@ export default {
 }
 
 .btn:last-child {
-  background-color: #0000ff;
-  color: white;
+  background-color: #00E5FF;
+  color: black;
 }
 
 /*  Enlace Registro y Error  */

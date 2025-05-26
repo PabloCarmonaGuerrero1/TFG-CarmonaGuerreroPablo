@@ -9,7 +9,7 @@
             <img :src="item.image" alt="Product-image" class="shoppingcart-product-image" />
             <div>
               <label :for="'product-' + item.id"><strong>{{ item.product_name || "Loading..." }}</strong></label>
-              <p class="product-price">Price: ${{ (item.total_price * item.amount).toFixed(2) }}</p>
+              <p class="product-price">Price: ${{ (item.total_price).toFixed(2) }}</p>
               <div class="shoppingcart-quantity-controls">
                 <button @click="alterQuantity(item, -1)" class="shoppingcart-button-quantity">➖</button>
                 <input 
@@ -39,7 +39,7 @@
             <img :src="item.image" alt="Product-image" class="shoppingcart-product-image" />
             <div>
               <label :for="'product-' + item.id"><strong>{{ item.product_name || "Loading..." }}</strong></label>
-              <p class="product-price">Price: ${{ (item.total_price * item.amount).toFixed(2) }}</p>
+              <p class="product-price">Price: ${{ (item.total_price).toFixed(2) }}</p>
               <div class="shoppingcart-quantity-controls">
                 <button @click="alterQuantity(item, -1)" class="shoppingcart-button-quantity">➖</button>
                 <input 

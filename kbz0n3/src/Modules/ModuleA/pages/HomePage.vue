@@ -66,9 +66,9 @@
         </div>
         <p>{{ product.name }}</p>
         <label :for="`quantity-${product.id}`" class="sr-only">Quantity</label>
-        <div class="quantity-controls">
+        <div class="homepage-quantity-controls">
           <button @click="decreaseQuantity(product.id)" class="homepage-quantity-button">➖</button>
-          <input type="number" :id="`quantity-${product.id}`" v-model="cart[product.id]" min="1" @input="updateQuantity(product.id)" class="quantity-input">
+          <input type="number" :id="`quantity-${product.id}`" v-model="cart[product.id]" min="1" @input="updateQuantity(product.id)" class="homepage-quantity-input">
           <button @click="increaseQuantity(product.id)" class="homepage-quantity-button">➕</button>
         </div>
         <div>
@@ -135,6 +135,19 @@ export default {
       
       const response = await axios.get('http://127.0.0.1:8000/api/products/search', { params });
       this.products = response.data;
+      const mainMealsSet = new Set();
+      const dietsSet = new Set();
+      const allergensSet = new Set();
+      this.products.forEach(product => {
+        if (product.main_meals) mainMealsSet.add(product.main_meals);
+        if (product.diet) dietsSet.add(product.diet);
+        if (product.allergens) {
+          product.allergens.split(',').forEach(allergen => allergensSet.add(allergen.trim()));
+        }
+      });
+      this.uniqueMainMeals = [...mainMealsSet];
+      this.uniqueDiets = [...dietsSet];
+      this.uniqueAllergens = [...allergensSet];
       this.currentPage = 1;
     },
 
@@ -383,6 +396,7 @@ export default {
   border-radius: 1.875rem;
   background-color: #00E5FF;
   color: black;
+  font-family: "Keania One", sans-serif;
 }
 
 /* Resultados */
@@ -427,7 +441,7 @@ export default {
 }
 
 /* Controles de cantidad */
-.quantity-controls {
+.homepage-quantity-controls {
   display: flex;
   justify-content: center;
   gap: 0.3rem;
@@ -435,11 +449,12 @@ export default {
   font-family: "Keania One", sans-serif;
 }
 
-.quantity-input {
+.homepage-quantity-input {
   width: 3rem;
   text-align: center;
   padding: 0.3rem;
   border-radius: 0.4rem;
+  font-family: "Keania One", sans-serif;
 }
 
 /* Paginación */

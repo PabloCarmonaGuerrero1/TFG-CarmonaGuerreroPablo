@@ -79,7 +79,7 @@ export default {
         let apiUrl = `http://localhost:8000/api/reviews`;
 
         if (this.typeofreview === "Product") {
-          const productCheckUrl = `http://localhost:8000/api/product/search/${this.productName}`;
+          const productCheckUrl = `http://localhost:8000/api/products/search/?name=${this.productName}`;
           const response = await axios.get(productCheckUrl);
 
           if (!response.data || response.data.length === 0) {
