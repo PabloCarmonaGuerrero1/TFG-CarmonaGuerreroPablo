@@ -1,109 +1,104 @@
 <template>
-  <form class="admin-form-ad_el_ed" @submit.prevent="submitForm">
-    <label>Admin Options</label>
-    <select v-model="admin_selection">
-      <option value="edit">Edit</option>
-      <option value="add">Add</option>
-      <option value="eliminate">Eliminate</option>
-    </select>
-
-    <div v-if="admin_selection === 'edit'">
-      <label>Select Product to Edit</label>
-      <select v-model="selectedProductName" @change="loadProductData">
-        <option disabled value="">Select a product</option>
-        <option v-for="product in products" :key="product.id" :value="product.name">
-          {{ product.name }}
-        </option>
+  <div class="admin-page">
+    <form class="admin-selector">
+      <label>Admin Options</label>
+      <select v-model="admin_selection" @change="handleModeChange">
+        <option value="edit">Edit</option>
+        <option value="add">Add</option>
       </select>
+    </form>
+
+
+    <div v-if="admin_selection === 'edit' && !selectedProduct">
+      <div class="product-list">
+        <div v-for="product in paginatedProducts" :key="product.id" class="product-card">
+          <img :src="product.image" :alt="product.name" />
+          <p>{{ product.name }}</p>
+          <button @click="selectProduct(product)">Edit</button>
+          <button @click="deleteProduct(product.id)">Delete</button>
+        </div>
+      </div>
+      <div v-if="totalPages > 1" class="pagination-controls">
+        <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+        <span>Page {{ currentPage }} of {{ totalPages }}</span>
+        <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+      </div>
     </div>
 
-    <div v-if="admin_selection === 'add' || admin_selection === 'edit'">
-      <label>Product Name</label>
-      <input type="text" v-model="form.name" placeholder="Chicken">
-      <span v-if="errors.name" class="error">{{ errors.name }}</span>
+    <div v-if="admin_selection === 'add' || selectedProduct">
+      <form @submit.prevent="submitForm">
+        <h3>{{ selectedProduct ? 'Edit Product' : 'Add Product' }}</h3>
+        <label>Product Name</label>
+        <input type="text" v-model="form.name" placeholder="Chicken" />
+        <span v-if="errors.name">{{ errors.name }}</span>
 
-      <label>Type of Product</label>
-      <select v-model="form.TypeOfProduct">
-        <option value="food">Food</option>
-        <option value="drink">Drink</option>
-      </select>
-      <span v-if="errors.TypeOfProduct" class="error">{{ errors.TypeOfProduct }}</span>
+        <label>Type of Product</label>
+        <select v-model="form.TypeOfProduct">
+          <option value="food">Food</option>
+          <option value="drink">Drink</option>
+        </select>
+        <span v-if="errors.TypeOfProduct">{{ errors.TypeOfProduct }}</span>
 
-      <label>Image URL</label>
-      <input type="text" v-model="form.image" placeholder="Image URL">
-      <span v-if="errors.image" class="error">{{ errors.image }}</span>
+        <label>Image URL</label>
+        <input type="text" v-model="form.image" />
+        <span v-if="errors.image">{{ errors.image }}</span>
 
-      <label>Main Meal</label>
-      <select v-model="form.main_meals">
-        <option value="all">All</option>
-        <option value="breakfast">Breakfast</option>
-        <option value="lunch">Lunch</option>
-        <option value="afternoon_snack">Afternoon Snack</option>
-        <option value="dinner">Dinner</option>
-      </select>
-      <span v-if="errors.main_meals" class="error">{{ errors.main_meals }}</span>
+        <label>Main Meal</label>
+        <select v-model="form.main_meals">
+          <option value="all">All</option>
+          <option value="breakfast">Breakfast</option>
+          <option value="lunch">Lunch</option>
+          <option value="afternoon_snack">Afternoon Snack</option>
+          <option value="dinner">Dinner</option>
+        </select>
+        <span v-if="errors.main_meals">{{ errors.main_meals }}</span>
 
-      <label>Description</label>
-      <textarea v-model="form.description" placeholder="Product description"></textarea>
-      <span v-if="errors.description" class="error">{{ errors.description }}</span>
+        <label>Description</label>
+        <textarea v-model="form.description"></textarea>
+        <span v-if="errors.description">{{ errors.description }}</span>
 
-      <label>Product Price: {{ form.price }}</label>
-      <input type="range" v-model.number="form.price" min="1" max="50">
-      <span v-if="errors.price" class="error">{{ errors.price }}</span>
+        <label>Price: {{ form.price }}</label>
+        <input type="range" min="1" max="50" v-model.number="form.price" />
+        <span v-if="errors.price">{{ errors.price }}</span>
 
-      <label>Allergens</label>
-      <select v-model="form.allergens" multiple size="7">
-        <option value="none">None</option>
-        <option value="dairy">Dairy</option>
-        <option value="gluten">Gluten</option>
-        <option value="eggs">Eggs</option>
-        <option value="fish">Fish</option>
-        <option value="crustacean_shellfish">Crustacean shellfish</option>
-        <option value="tree_nuts">Tree nuts</option>
-        <option value="peanuts">Peanuts</option>
-        <option value="wheat">Wheat</option>
-        <option value="soybeans">Soybeans</option>
-        <option value="sesame">Sesame</option>
-        <option value="mustard">Mustard</option>
-        <option value="lupin">Lupin</option>
-        <option value="mollusks">Mollusks</option>
-        <option value="celery">Celery</option>
-        <option value="sulphites">Sulphites</option>
-      </select>
-      <span v-if="errors.allergens" class="error">{{ errors.allergens }}</span>
+        <label>Allergens</label>
+        <multiselect
+          v-model="form.allergens"
+          :options="allergensOptions"
+          :multiple="true"
+          :close-on-select="false"
+          :clear-on-select="false"
+          :preserve-search="true"
+          label="label"
+          track-by="value"
+        />
+        <span v-if="errors.allergens">{{ errors.allergens }}</span>
 
-      <label>Diet</label>
-      <select v-model="form.diet">
-        <option value="nospecialdiet">No special diet</option>
-        <option value="vegetarian">Vegetarian</option>
-        <option value="vegan">Vegan</option>
-      </select>
+        <label>Diet</label>
+        <select v-model="form.diet">
+          <option value="nospecialdiet">No special diet</option>
+          <option value="vegetarian">Vegetarian</option>
+          <option value="vegan">Vegan</option>
+        </select>
 
-      <button type="submit">{{ admin_selection === 'edit' ? 'Update' : 'Add' }} Product</button>
+        <button type="submit">{{ selectedProduct ? 'Update' : 'Add' }} Product</button>
+        <button type="button" @click="cancelEdit" v-if="selectedProduct">Cancel</button>
+      </form>
     </div>
-
-    <div v-if="admin_selection === 'eliminate'">
-      <label>Select Product to Delete</label>
-      <select v-model="selectedProductName">
-        <option disabled value="">Select a product</option>
-        <option v-for="product in products" :key="product.id" :value="product.name">
-          {{ product.name }}
-        </option>
-      </select>
-      <button @click.prevent="deleteProduct">Delete Product</button>
-    </div>
-  </form>
+  </div>
 </template>
 
 <script>
 import axios from "axios";
+import Multiselect from "vue-multiselect";
 
 export default {
+  components: { Multiselect },
   data() {
     return {
       admin_selection: "edit",
       products: [],
-      selectedProductName: "",
+      selectedProduct: null,
       form: {
         id: null,
         name: "",
@@ -115,116 +110,86 @@ export default {
         allergens: [],
         diet: ""
       },
+      allergensOptions: [
+        { label: "None", value: "none" },
+        { label: "Dairy", value: "dairy" },
+        { label: "Gluten", value: "gluten" },
+        { label: "Eggs", value: "eggs" },
+        { label: "Fish", value: "fish" },
+        { label: "Crustacean shellfish", value: "crustacean_shellfish" },
+        { label: "Tree nuts", value: "tree_nuts" },
+        { label: "Peanuts", value: "peanuts" },
+        { label: "Wheat", value: "wheat" },
+        { label: "Soybeans", value: "soybeans" },
+        { label: "Sesame", value: "sesame" },
+        { label: "Mustard", value: "mustard" },
+        { label: "Lupin", value: "lupin" },
+        { label: "Mollusks", value: "mollusks" },
+        { label: "Celery", value: "celery" },
+        { label: "Sulphites", value: "sulphites" },
+      ],
       errors: {},
-      justSubmitted: false,
-      isEditing: false
+      currentPage: 1,
+      itemsPerPage: 8
     };
   },
-  mounted() {
-    axios.get("http://localhost:8000/api/product/")
-      .then(response => {
-        this.products = response.data;
-      });
-  },
-  watch: {
-    "form.name"(val) {
-      if (this.justSubmitted) return;
-      if (!val) this.errors.name = "Name is required.";
-      else if (val.length < 3) this.errors.name = "Name must be at least 3 characters.";
-      else delete this.errors.name;
+  computed: {
+    totalPages() {
+      return Math.ceil(this.products.length / this.itemsPerPage);
     },
-    "form.description"(val) {
-      if (this.justSubmitted) return;
-      if (!val) this.errors.description = "Description is required.";
-      else if (val.length < 3) this.errors.description = "Description must be at least 3 characters.";
-      else delete this.errors.description;
-    },
-    "form.TypeOfProduct"(val) {
-      if (this.justSubmitted) return;
-      if (!val) this.errors.TypeOfProduct = "Type of Product is required.";
-      else delete this.errors.TypeOfProduct;
-    },
-    "form.image"(val) {
-      if (this.justSubmitted) return;
-      if (val && val.length < 3) this.errors.image = "Image URL must be at least 3 characters.";
-      else delete this.errors.image;
-    },
-    "form.main_meals"(val) {
-      if (this.justSubmitted) return;
-      if (!val) this.errors.main_meals = "Main meal is required.";
-      else delete this.errors.main_meals;
-    },
-    "form.price"(val) {
-      if (this.justSubmitted) return;
-      if (val === null || isNaN(val)) this.errors.price = "Price must be a number.";
-      else if (val < 0) this.errors.price = "Price must be 0 or more.";
-      else delete this.errors.price;
-    },
-    "form.allergens"(val) {
-      if (this.justSubmitted) return;
-      if (!val.length) this.errors.allergens = "At least one allergen must be selected.";
-      else delete this.errors.allergens;
+    paginatedProducts() {
+      const start = (this.currentPage - 1) * this.itemsPerPage;
+      return this.products.slice(start, start + this.itemsPerPage);
     }
   },
+  mounted() {
+    this.fetchProducts();
+  },
   methods: {
-    fetchProducts() {
-        axios.get("http://localhost:8000/api/product/")
-        .then(response => {
-            this.products = response.data;
-        })
-        .catch(error => {
-            console.error("Error fetching products:", error);
-        });
+    handleModeChange() {
+      this.resetForm();
     },
-    loadProductData() {
-      const product = this.products.find(p => p.name === this.selectedProductName);
-      if (product) {
-        this.form = { ...product };
-        this.isEditing = true;
-        this.errors = {};
-      }
+    fetchProducts() {
+      axios.get("http://localhost:8000/api/product/")
+        .then(response => {
+          this.products = response.data;
+        })
+        .catch(error => console.error("Error fetching products:", error));
+    },
+    selectProduct(product) {
+      this.form = {
+        ...product,
+        allergens: product.allergens === "none" ? ["none"] : product.allergens.split(",")
+      };
+      this.selectedProduct = product;
     },
     submitForm() {
-      const hasErrors = Object.keys(this.errors).length;
-      if (hasErrors) return;
-
       const payload = {
         ...this.form,
-        allergens: this.form.allergens.includes("none") ? "none" : this.form.allergens.join(",")
+        allergens: this.form.allergens.includes("none")
+          ? "none"
+          : this.form.allergens.join(",")
       };
 
-      const request = this.isEditing
+      const request = this.selectedProduct
         ? axios.put(`http://localhost:8000/api/product/${this.form.id}/`, payload)
-        : axios.post("http://localhost:8000/api/product/", payload);
+        : axios.post(`http://localhost:8000/api/product/`, payload);
 
       request.then(() => {
-        console.log(this.isEditing ? "Product updated successfully!" : "Product added successfully!");
+        this.fetchProducts();
         this.resetForm();
-      }).catch(error => {
-        console.log("Error saving product.");
-        console.error(error);
-      });
+      }).catch(error => console.error("Error saving product:", error));
     },
-        deleteProduct() {
-      const product = this.products.find(p => p.name === this.selectedProductName);
-      if (!product) return;
-
-      if (!confirm(`Are you sure you want to delete "${product.name}"?`)) return;
-
-      axios.delete(`http://localhost:8000/api/product/${product.id}/`)
-        .then(() => {
-          console.log("Product deleted successfully!");
-          this.fetchProducts();
-          this.selectedProductName = "";
-        })
-        .catch(error => {
-          console.log("Error deleting product.");
-          console.error(error);
-        });
+    deleteProduct(productId) {
+      if (!confirm("Are you sure you want to delete this product?")) return;
+      axios.delete(`http://localhost:8000/api/product/${productId}/`)
+        .then(() => this.fetchProducts())
+        .catch(error => console.error("Error deleting product:", error));
+    },
+    cancelEdit() {
+      this.resetForm();
     },
     resetForm() {
-      this.justSubmitted = true;
-      this.errors = {};
       this.form = {
         id: null,
         name: "",
@@ -236,25 +201,115 @@ export default {
         allergens: [],
         diet: ""
       };
-      this.selectedProductName = "";
-      this.isEditing = false;
-      setTimeout(() => {
-        this.justSubmitted = false;
-      }, 100);
+      this.selectedProduct = null;
+    },
+    nextPage() {
+      if (this.currentPage < this.totalPages) this.currentPage++;
+    },
+    prevPage() {
+      if (this.currentPage > 1) this.currentPage--;
     }
   }
 };
 </script>
 
-<style>
+<style scoped>
+@import "~vue-multiselect/dist/vue-multiselect.min.css";
+@import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
+
+.admin-page {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 2rem;
+  font-family: "Keania One", sans-serif;
+}
+
+.admin-selector {
+  margin-top: 15vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  font-family: "Keania One", sans-serif;
+}
+
+.product-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+}
+
+.product-card {
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  background-color: #fafafa;
+}
+
+.product-card img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+}
+
+.pagination-controls {
+  margin-top: 1.5rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+}
+
 .admin-form-ad_el_ed {
-  margin-top: 20vh;
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  background-color: #f5f5f5;
+  padding: 2rem;
+  border-radius: 10px;
 }
+
+.admin-form-ad_el_ed h3 {
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.admin-form-ad_el_ed label {
+  font-weight: bold;
+}
+
+.admin-form-ad_el_ed input[type="text"],
+.admin-form-ad_el_ed select,
+.admin-form-ad_el_ed textarea {
+  width: 100%;
+  padding: 0.5rem;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+.admin-form-ad_el_ed input[type="range"] {
+  width: 100%;
+}
+
+.admin-form-ad_el_ed button {
+  padding: 0.6rem 1rem;
+  background-color: #2e86de;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.admin-form-ad_el_ed button:hover {
+  background-color: #1b4f72;
+}
+
 .error {
   color: red;
-  font-size: 0.85em;
+  font-size: 0.9rem;
 }
 </style>

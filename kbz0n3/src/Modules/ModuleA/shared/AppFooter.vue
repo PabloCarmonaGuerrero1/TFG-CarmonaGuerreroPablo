@@ -16,12 +16,12 @@
 @import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
 
 .Footer {
-  background-color: #0077FF;
-  padding: 0.5rem 1rem; /* margen interno */
+  background-color: #00E5FF;
+  padding: 0.5rem 1rem; 
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: 100%;  /* ancho completo de la ventana */
+  width: 100%;  
   box-sizing: border-box;
   font-family: "Keania One", sans-serif;
   margin-top: auto;
@@ -29,6 +29,7 @@
 
 
 .Footer .copyright {
+  fontcolor: black;
   font-size: 1rem;
   padding-right: 1.5rem;
 }
