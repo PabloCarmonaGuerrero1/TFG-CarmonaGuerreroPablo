@@ -87,7 +87,7 @@ export default {
   methods: {
     async validateUsernameAvailability() {
       try {
-        const apiUrl = `http://localhost:8000/api/users/search/${this.username}`;
+        const apiUrl = `https://kbz0n3api-despliegue.onrender.com/api/users/search/${this.username}`;
         await axios.get(apiUrl);
         this.errors.usernameTaken = 'Username is already taken';
       } catch (error) {
@@ -154,7 +154,7 @@ export default {
     },
     async registerUser() {
       try {
-        const apiUrl = 'http://localhost:8000/api/users';
+        const apiUrl = 'https://kbz0n3api-despliegue.onrender.com/api/users';
         const userData = {
           name: this.username,
           DNI: this.DNI,
@@ -195,7 +195,7 @@ export default {
     },
     async getImage() {
       try {
-        const apiUrl = `http://localhost:8000/api/product`;
+        const apiUrl = `https://kbz0n3api-despliegue.onrender.com/api/product`;
         const response = await axios.get(apiUrl);
         
         if (response.data && Array.isArray(response.data)) {

@@ -58,7 +58,7 @@ export default {
       this.errors.username = "";
       this.errors.password = "";
       try {
-        const response = await axios.post("http://localhost:8000/api/login", {
+        const response = await axios.post("https://kbz0n3api-despliegue.onrender.com/api/login", {
           username: this.username,
           password: this.password,
         });
@@ -76,7 +76,7 @@ export default {
     },
     async getImage() {
       try {
-        const apiUrl = `http://localhost:8000/api/product`;
+        const apiUrl = `https://kbz0n3api-despliegue.onrender.com/api/product`;
         const response = await axios.get(apiUrl);
         
         if (response.data && Array.isArray(response.data)) {

@@ -170,7 +170,7 @@ export default {
     },
     async fetchProducts() {
       try {
-        const response = await axios.get('http://localhost:8000/api/product/');
+        const response = await axios.get('https://kbz0n3api-despliegue.onrender.com/api/product/');
         this.products = response.data;
 
         const mainMealsSet = new Set();
@@ -201,7 +201,7 @@ export default {
       if (!this.currentUser) return;
       try {
         const userId = this.currentUser.id.toString();
-        const cartResponse = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}`);
+        const cartResponse = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${userId}`);
         const cartData = cartResponse.data.data;
         this.cartProductIds = cartData.map(item => item.product_id);
       } catch (error) {
@@ -244,7 +244,7 @@ export default {
       try {
         let existingCartItem = null;
         try {
-          const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${product.id}`);
+          const responseCart = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${userId}/${product.id}`);
           existingCartItem = responseCart.data;
         } catch (error) {
           if (error.response && error.response.status === 404) {
@@ -253,7 +253,7 @@ export default {
         }
         if (existingCartItem) {
           const updatedQuantity = existingCartItem.amount + quantity;
-          await axios.put(`http://localhost:8000/api/shopping_cart/${existingCartItem.id}`, {
+          await axios.put(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${existingCartItem.id}`, {
             amount: updatedQuantity,
             total_price: updatedQuantity * product.price
           });
@@ -265,7 +265,7 @@ export default {
             amount: quantity,
             total_price: totalPrice
           };
-          await axios.post('http://localhost:8000/api/shopping_cart', cartData);
+          await axios.post('https://kbz0n3api-despliegue.onrender.com/api/shopping_cart', cartData);
           this.showNotification(`+${quantity} ${product.name} added to cart.`, 'success');
         }
         this.cart[product.id] = null;
@@ -284,7 +284,7 @@ export default {
       const userId = this.currentUser.id.toString();
 
       try {
-        const existingCartItem = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${productId}`);
+        const existingCartItem = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${userId}/${productId}`);
         if (!existingCartItem.data) {
           alert('Item not found in cart!');
           return;
@@ -296,12 +296,12 @@ export default {
         const currentQuantity = existingCartItem.data.amount;
 
         if (quantityToRemove >= currentQuantity) {
-          await axios.delete(`http://localhost:8000/api/shopping_cart/${existingCartItem.data.id}`);
+          await axios.delete(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${existingCartItem.data.id}`);
           delete this.cart[productId];
           this.showNotification(`-${currentQuantity} ${productName} deleted. No longer in your cart.`, 'error');
         } else {
           const updatedQuantity = currentQuantity - quantityToRemove;
-          await axios.put(`http://localhost:8000/api/shopping_cart/${existingCartItem.data.id}`, {
+          await axios.put(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${existingCartItem.data.id}`, {
             amount: updatedQuantity,
             total_price: updatedQuantity * existingCartItem.data.total_price / currentQuantity
           });
@@ -345,7 +345,7 @@ export default {
     const token = localStorage.getItem('token');
     if (token) {
       try {
-        const response = await fetch('http://localhost:8000/api/me', {
+        const response = await fetch('https://kbz0n3api-despliegue.onrender.com/api/me', {
           headers: {
             Authorization: `Bearer ${token}`
           }

@@ -296,7 +296,7 @@ export default {
       event.target.src = this.defaultImage;
     },
     fetchProducts() {
-      axios.get("http://localhost:8000/api/product/")
+      axios.get("https://kbz0n3api-despliegue.onrender.com/api/product/")
         .then(response => {
           this.products = response.data;
           const mainMealsSet = new Set();
@@ -425,8 +425,8 @@ export default {
         : this.form.allergens.map(a => a.value).join(",")
       };
       const request = this.selectedProduct
-      ? axios.put(`http://localhost:8000/api/product/${this.form.id}/`, payload)
-      : axios.post(`http://localhost:8000/api/product/`, payload);
+      ? axios.put(`https://kbz0n3api-despliegue.onrender.com/api/product/${this.form.id}/`, payload)
+      : axios.post(`https://kbz0n3api-despliegue.onrender.com/api/product/`, payload);
       request.then(() => {
         this.fetchProducts();
         this.resetForm();
@@ -438,7 +438,7 @@ export default {
     },
     deleteProduct(productId) {
       if (!confirm("Are you sure you want to delete this product?")) return;
-      axios.delete(`http://localhost:8000/api/product/${productId}/`)
+      axios.delete(`https://kbz0n3api-despliegue.onrender.com/api/product/${productId}/`)
         .then(() => {
           this.fetchProducts();
           this.showNotification("🗑️ Product eliminated", "error");

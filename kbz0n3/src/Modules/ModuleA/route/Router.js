@@ -34,7 +34,7 @@ const fetchUserData = async () => {
   if (cachedUserData) return cachedUserData;
 
   try {
-    const res = await fetch('http://localhost:8000/api/me', {
+    const res = await fetch('https://kbz0n3api-despliegue.onrender.com/api/me', {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -52,7 +52,7 @@ const fetchUserData = async () => {
 
 const checkProductExists = async (productId) => {
   try {
-    const response = await fetch(`http://localhost:8000/api/product/${productId}`);
+    const response = await fetch(`https://kbz0n3api-despliegue.onrender.com/api/product/${productId}`);
     return response.ok;
   } catch (error) {
     console.error('Error al verificar producto:', error);

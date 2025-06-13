@@ -115,7 +115,7 @@ export default {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const response2 = await fetch("http://localhost:8000/api/me", {
+        const response2 = await fetch("https://kbz0n3api-despliegue.onrender.com/api/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -123,13 +123,13 @@ export default {
         const data = await response2.json();
         const userId = data.id
         useradress.value = data.adress;
-        const response = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}`);
+        const response = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${userId}`);
         const cartData = response.data.data;
 
         const updatedCart = await Promise.all(
           cartData.map(async (item) => {
             try {
-              const productResponse = await axios.get(`http://localhost:8000/api/product/${item.product_id}`);
+              const productResponse = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/product/${item.product_id}`);
               const product = productResponse.data;
               return { 
                 ...item, 
@@ -162,7 +162,7 @@ export default {
       const newTotalPriceitem = (item.total_price / oldAmount) * newAmount;
 
       try {
-        await axios.put(`http://localhost:8000/api/shopping_cart/${item.id}`, {
+        await axios.put(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${item.id}`, {
           amount: item.amount,
           total_price: newTotalPriceitem
         });
@@ -180,7 +180,7 @@ export default {
 
     const deleteItem = async (item, category) => {
       try {
-        await axios.delete(`http://localhost:8000/api/shopping_cart/${item.id}`);
+        await axios.delete(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${item.id}`);
 
         if (category === 'food') {
           food.value = food.value.filter(i => i.id !== item.id);
@@ -197,12 +197,12 @@ export default {
       try {
         if (category === 'food') {
           for (const item of food.value) {
-            await axios.delete(`http://localhost:8000/api/shopping_cart/${item.id}`);
+            await axios.delete(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${item.id}`);
           }
           food.value = [];
         } else if (category === 'drink') {
           for (const item of drinks.value) {
-            await axios.delete(`http://localhost:8000/api/shopping_cart/${item.id}`);
+            await axios.delete(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${item.id}`);
           }
           drinks.value = [];
         }
@@ -231,7 +231,7 @@ export default {
       try {
         const cartItems = [...food.value, ...drinks.value];
         for (const item of cartItems) {
-          await axios.delete(`http://localhost:8000/api/shopping_cart/${item.id}`);
+          await axios.delete(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${item.id}`);
         }
 
         food.value = [];

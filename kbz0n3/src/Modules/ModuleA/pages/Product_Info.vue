@@ -90,7 +90,7 @@ export default {
     async getProductInfo() {
       try {
         this.productId = localStorage.getItem('selectedProduct');
-        const response = await axios.get(`http://localhost:8000/api/product/${this.productId}`);
+        const response = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/product/${this.productId}`);
         const data = response.data;
         this.name = data.name;
         this.price = data.price;
@@ -111,7 +111,7 @@ export default {
       if (!this.currentUser) return;
       try {
         const userId = this.currentUser.id;
-        const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${this.productId}`);
+        const responseCart = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${userId}/${this.productId}`);
         this.cartQuantity = responseCart.data.amount || 0;
       } catch {
         this.cartQuantity = 0;
@@ -136,7 +136,7 @@ export default {
 
         let existingCartItem = null;
         try {
-          const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${this.productId}`);
+          const responseCart = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${userId}/${this.productId}`);
           existingCartItem = responseCart.data;
         } catch (error) {
           if (error.response && error.response.status === 404) existingCartItem = null;
@@ -144,13 +144,13 @@ export default {
 
         if (existingCartItem) {
           const updatedQuantity = existingCartItem.amount + this.quantityInput;
-          await axios.put(`http://localhost:8000/api/shopping_cart/${existingCartItem.id}`, {
+          await axios.put(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${existingCartItem.id}`, {
             amount: updatedQuantity,
             total_price: updatedQuantity * this.price,
           });
           this.showNotification(`+${this.quantityInput} ${this.name} added. Now you have ${updatedQuantity}.`, "success");
         } else {
-          await axios.post("http://localhost:8000/api/shopping_cart", {
+          await axios.post("https://kbz0n3api-despliegue.onrender.com/api/shopping_cart", {
             user_id: userId,
             product_id: this.productId,
             amount: this.quantityInput,
@@ -179,7 +179,7 @@ export default {
 
       try {
         const userId = this.currentUser.id.toString();
-        const existingCartItem = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${this.productId}`);
+        const existingCartItem = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${userId}/${this.productId}`);
         if (!existingCartItem.data) {
           this.showNotification("Item not found in cart!", "error");
           return;
@@ -187,12 +187,12 @@ export default {
 
         const currentQuantity = existingCartItem.data.amount;
         if (this.quantityInput >= currentQuantity) {
-          await axios.delete(`http://localhost:8000/api/shopping_cart/${existingCartItem.data.id}`);
+          await axios.delete(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${existingCartItem.data.id}`);
           this.cartQuantity = 0;
           this.showNotification(`-${currentQuantity} ${this.name} removed. No longer in your cart.`, "error");
         } else {
           const updatedQuantity = currentQuantity - this.quantityInput;
-          await axios.put(`http://localhost:8000/api/shopping_cart/${existingCartItem.data.id}`, {
+          await axios.put(`https://kbz0n3api-despliegue.onrender.com/api/shopping_cart/${existingCartItem.data.id}`, {
             amount: updatedQuantity,
             total_price: updatedQuantity * this.price,
           });
@@ -226,7 +226,7 @@ export default {
         const favoriteField = this.TypeOfProduct === 'Food' ? 'fav_food' : 'fav_drink';
         const newFavoriteValue = this.isFavorite ? "nothing" : this.productId;
 
-        await axios.put(`http://localhost:8000/api/users/${this.currentUser.id}`, {
+        await axios.put(`https://kbz0n3api-despliegue.onrender.com/api/users/${this.currentUser.id}`, {
           ...this.currentUser,
           [favoriteField]: newFavoriteValue,
         });
@@ -266,7 +266,7 @@ export default {
     const token = localStorage.getItem("token");
     if (token) {
       try {
-        const response = await fetch("http://localhost:8000/api/me", {
+        const response = await fetch("https://kbz0n3api-despliegue.onrender.com/api/me", {
           headers: {
             Authorization: `Bearer ${token}`
           }
