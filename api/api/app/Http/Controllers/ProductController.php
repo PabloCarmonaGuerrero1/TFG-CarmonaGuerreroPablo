@@ -12,43 +12,44 @@ class ProductController extends Controller
      */
     public function index()
     {
-        $products = Product::all();  // Obtiene todos los productos
-        return response()->json($products);  // Devuelve la lista en formato JSON
+        $products = Product::all(); 
+        return response()->json($products);  
     }
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        // Verificar si el request contiene múltiples productos
-        $products = $request->all();
-    
-        if (!is_array($products)) {
-            return response()->json(['error' => 'El formato de datos es incorrecto, se espera un array de productos.'], 400);
-        }
-    
-        $createdProducts = [];
-    
-        foreach ($products as $productData) {
-            $validated = validator($productData, [
-                'name' => 'required|string|max:255',
-                'image' => 'nullable|string|url',
-                'main_meals' => 'required|string|max:255',
-                'description' => 'required|string',
-                'price' => 'required|numeric|min:0',
-                'allergens' => 'nullable|string',
-                'diet' => 'nullable|string',
-                'TypeOfProduct' => 'required|string|max:255',
-            ])->validate();
-    
-            $createdProducts[] = Product::create($validated);
-        }
-    
-        return response()->json([
-            'message' => count($createdProducts) . ' productos creados exitosamente',
-            'products' => $createdProducts
-        ], 201);
+ public function store(Request $request)
+{
+    $productsData = $request->all();
+
+
+    if (!is_array($productsData) || array_keys($productsData) !== range(0, count($productsData) - 1)) {
+        $productsData = [$productsData]; 
     }
+
+    $createdProducts = [];
+
+    foreach ($productsData as $productData) {
+        $validated = validator($productData, [
+            'name' => 'required|string|max:255',
+            'image' => 'nullable|string|url',
+            'main_meals' => 'required|string|max:255',
+            'description' => 'required|string',
+            'price' => 'required|numeric|min:0',
+            'allergens' => 'nullable|string',
+            'diet' => 'nullable|string',
+            'TypeOfProduct' => 'required|string|max:255',
+        ])->validate();
+
+        $createdProducts[] = Product::create($validated);
+    }
+
+    return response()->json([
+        'message' => count($createdProducts) . ' producto(s) creado(s) exitosamente',
+        'products' => $createdProducts
+    ], 201);
+}
+
     
     
 
@@ -57,7 +58,6 @@ class ProductController extends Controller
      */
     public function update(Request $request, Product $product)
     {
-        // Validación de los datos recibidos
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'main_meals' => 'required|string|max:255',
