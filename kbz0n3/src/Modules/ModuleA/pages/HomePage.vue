@@ -192,7 +192,6 @@ export default {
       this.uniqueMainMeals = [...mainMealsSet];
       this.uniqueDiets = [...dietsSet];
       this.uniqueAllergens = [...allergensSet];
-      this.currentPage = 1;
     } catch (error) {
       console.error('Error fetching products:', error);
     }

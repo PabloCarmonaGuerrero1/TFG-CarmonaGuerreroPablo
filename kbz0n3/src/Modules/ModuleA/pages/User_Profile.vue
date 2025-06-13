@@ -49,7 +49,7 @@
       <h3>Favorite Products</h3>
       <div v-if="favoriteProducts && favoriteProducts.length > 0" class="profile-product-list">
         <div v-for="product in favoriteProducts" :key="product.id" class="profile-product-item">
-          <img :src="product.imageUrl" :alt="product.name" class="profile-product-image" @click="selectProduct(product.id)" />
+          <img :src="product.imageUrl" :alt="product.name" class="profile-product-image" @click="selectProduct(product.id)" @error="onProductImageError"/>
           <p>{{ product.name }}</p>
         </div>
       </div>
@@ -274,6 +274,9 @@ export default {
         this.notificationType = "";
       }, 3000);
     },
+    onProductImageError(event) {
+      event.target.src = this.defaultImage;
+    }
   },
 
   mounted() {
