@@ -2,63 +2,69 @@
   <div class="shoppingcart-page">
     <h2>Shopping Cart</h2>
     <div class="shoppingcart-columns">
-      <div class="shoppingcart-column-food">
-        <h3>Meals</h3>
-        <ul v-if="paginatedFood.length">
-          <li v-for="item in paginatedFood" :key="item.id">
+      <div class="shoppingcart-column-food" >
+        <h3>Food</h3>
+        <ul v-if="paginatedFood.length" class="shoppingcart-ul">
+          <li v-for="item in paginatedFood" :key="item.id" class="shoppingcart-li">
             <img :src="item.image" alt="Product-image" class="shoppingcart-product-image" />
-            <div>
+            <div class="shoppingcart-product-info">
               <label :for="'product-' + item.id"><strong>{{ item.product_name || "Loading..." }}</strong></label>
               <p class="product-price">Price: ${{ (item.total_price).toFixed(2) }}</p>
-              <div class="shoppingcart-quantity-controls">
-                <button @click="alterQuantity(item, -1)" class="shoppingcart-button-quantity">➖</button>
-                <input 
-                  type="number" 
-                  v-model="item.amount" 
-                  min="1" 
-                  class="shoppingcart-quantity-input" 
-                  readonly 
-                  :id="'product-' + item.id" />
-                <button @click="alterQuantity(item, 1)" class="shoppingcart-button-quantity">➕</button>
+              <div class="shoppingcart-action-group">
+                <div class="shoppingcart-quantity-controls">
+                  <button @click="alterQuantity(item, -1)" class="shoppingcart-button-quantity">➖</button>
+                  <input 
+                    type="number" 
+                    v-model="item.amount" 
+                    min="1" 
+                    class="shoppingcart-quantity-input" 
+                    readonly 
+                    :id="'product-' + item.id" />
+                  <button @click="alterQuantity(item, 1)" class="shoppingcart-button-quantity">➕</button>
+                </div>
               </div>
               <button @click="deleteItem(item, 'food')" class="shoppingcart-delete-btn">Delete</button>
             </div>
           </li>
         </ul>
         <p v-else>There are no food items in the cart.</p>
-
-        <button v-if="food.length" @click="prevPage('food')" class="shoppingcart-button-pagination">Previous</button>
-        <button v-if="food.length" @click="clearCategory('food')" class="shoppingcart-button-clean">Clean Food</button>
-        <button v-if="food.length" @click="nextPage('food')" class="shoppingcart-button-pagination">Next</button>
+        <div class="shoppingcart-pagination-controls" v-if="food.length">
+          <button @click="prevPage('food')" :disabled="isFirstFoodPage" class="shoppingcart-button-pagination">Previous</button>
+          <span class="shoppingcart-page-info">Page {{ foodPage + 1 }} of {{ totalFoodPages }}</span>
+          <button @click="nextPage('food')" :disabled="isLastFoodPage" class="shoppingcart-button-pagination">Next</button>
+        </div>
       </div>
-
       <div class="shoppingcart-column-drink">
         <h3>Drinks</h3>
-        <ul v-if="paginatedDrinks.length">
-          <li v-for="item in paginatedDrinks" :key="item.id">
+        <ul v-if="paginatedDrinks.length" class="shoppingcart-ul">
+          <li v-for="item in paginatedDrinks" :key="item.id" class="shoppingcart-li">
             <img :src="item.image" alt="Product-image" class="shoppingcart-product-image" />
-            <div>
+            <div class="shoppingcart-product-info">
               <label :for="'product-' + item.id"><strong>{{ item.product_name || "Loading..." }}</strong></label>
               <p class="product-price">Price: ${{ (item.total_price).toFixed(2) }}</p>
-              <div class="shoppingcart-quantity-controls">
-                <button @click="alterQuantity(item, -1)" class="shoppingcart-button-quantity">➖</button>
-                <input 
-                  type="number" 
-                  v-model="item.amount" 
-                  min="1" 
-                  class="shoppingcart-quantity-input" 
-                  readonly 
-                  :id="'product-' + item.id" />
-                <button @click="alterQuantity(item, 1)" class="shoppingcart-button-quantity">➕</button>
+              <div class="shoppingcart-action-group">
+                <div class="shoppingcart-quantity-controls">
+                  <button @click="alterQuantity(item, -1)" class="shoppingcart-button-quantity">➖</button>
+                  <input 
+                    type="number" 
+                    v-model="item.amount" 
+                    min="1" 
+                    class="shoppingcart-quantity-input" 
+                    readonly 
+                    :id="'product-' + item.id" />
+                  <button @click="alterQuantity(item, 1)" class="shoppingcart-button-quantity">➕</button>
+                </div>
               </div>
               <button @click="deleteItem(item, 'drink')" class="shoppingcart-delete-btn">Delete</button>
             </div>
           </li>
         </ul>
         <p v-else>There are no beverage products in the cart.</p>
-        <button v-if="drinks.length" @click="prevPage('drink')" class="shoppingcart-button-pagination">Previous</button>
-        <button v-if="drinks.length" @click="clearCategory('drink')" class="shoppingcart-button-clean">Clean Drink</button>
-        <button v-if="drinks.length" @click="nextPage('drink')" class="shoppingcart-button-pagination">Next</button>
+        <div class="shoppingcart-pagination-controls" v-if="drinks.length">
+          <button @click="prevPage('drink')" :disabled="isFirstDrinkPage" class="shoppingcart-button-pagination">Previous</button>
+          <span class="shoppingcart-page-info">Page {{ drinkPage + 1 }} of {{ totalDrinkPages }}</span>
+          <button @click="nextPage('drink')" :disabled="isLastDrinkPage" class="shoppingcart-button-pagination">Next</button>
+        </div>
       </div>
     </div>
 
@@ -67,9 +73,10 @@
     </div>
 
     <div class="button-container">
-  <button @click="openAddressPopup" class="shoppingcart-button-confirm">Confirm and Empty Cart</button>
-</div>
-
+      <button @click="clearCategory('food')" class="shoppingcart-button-clean" :disabled="food.length === 0">Clean Food</button>
+      <button @click="openAddressPopup" class="shoppingcart-button-confirm">Confirm and Empty Cart</button>
+      <button @click="clearCategory('drink')" class="shoppingcart-button-clean" :disabled="drinks.length === 0">Clean Drink</button>
+    </div>
   </div>
 
   <div v-if="showAddressPopup" class="shoppingcart-popup-overlay">
@@ -105,11 +112,16 @@ export default {
 
     const fetchCart = async () => {
       try {
-        const username = localStorage.getItem('username');
-        const getid = await axios.get(`http://localhost:8000/api/users/search/${username}`);
-        const userId = getid.data.id;
-        useradress.value = getid.data.adress;
-
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const response2 = await fetch("http://localhost:8000/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response2.json();
+        const userId = data.id
+        useradress.value = data.adress;
         const response = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}`);
         const cartData = response.data.data;
 
@@ -240,6 +252,15 @@ export default {
       return drinks.value.slice(start, start + itemsPerPage);
     });
 
+    const totalFoodPages = computed(() => Math.ceil(food.value.length / itemsPerPage));
+    const totalDrinkPages = computed(() => Math.ceil(drinks.value.length / itemsPerPage));
+
+    const isFirstFoodPage = computed(() => foodPage.value === 0);
+    const isLastFoodPage = computed(() => foodPage.value >= totalFoodPages.value - 1);
+    
+    const isFirstDrinkPage = computed(() => drinkPage.value === 0);
+    const isLastDrinkPage = computed(() => drinkPage.value >= totalDrinkPages.value - 1);
+
     const nextPage = (category) => {
       if (category === 'food' && (foodPage.value + 1) * itemsPerPage < food.value.length) {
         foodPage.value++;
@@ -285,13 +306,20 @@ export default {
       paginatedFood, 
       paginatedDrinks, 
       nextPage, 
-      prevPage 
+      prevPage,
+      foodPage,
+      drinkPage,
+      isFirstFoodPage,
+      isLastFoodPage,
+      isFirstDrinkPage,
+      isLastDrinkPage,
+      totalFoodPages,
+      totalDrinkPages, 
     };
   },
 };
 </script>
   
-
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
 
@@ -299,7 +327,7 @@ export default {
 .shoppingcart-page {
   font-family: "Keania One", sans-serif;
   margin: 8rem 0;
-  min-height: 100vh;
+  min-height: 80vh;
 }
 
 /* Títulos */
@@ -311,38 +339,37 @@ h2 {
 /* Columnas principales */
 .shoppingcart-columns {
   display: flex;
-  justify-content: space-around;
+  justify-content: center;
+  gap: 2rem; 
   margin-top: 20px;
-  text-align: center;
-  flex-grow: 1;
+  flex-wrap: wrap;
 }
 
-/* Columnas individuales */
-.shoppingcart-column {
-  width: 35%;
-  padding: 10px;
-  box-sizing: border-box;
-  position: relative;
-}
-
-.shoppingcart-column h3 {
-  text-align: center;
-}
 
 /* Tarjetas de comida/bebida */
-.shoppingcart-food,
-.shoppingcart-drink {
-  min-height: 40rem;
-  width: 30rem;
-  border: 1px solid #ddd;
+.shoppingcart-column-food,
+.shoppingcart-column-drink {
+  flex: 1 1 45%; 
+  max-width: 45%;
+  min-width: 300px; 
+  background-color: #F7F7F7;
+  padding: 1rem;
   border-radius: 5px;
-  padding: 10px;
-  background-color: #D9D9D9;
+  box-sizing: border-box;
+}
+.shoppingcart-column-food h3,
+.shoppingcart-column-drink h3 {
+  text-align: center;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+.shoppingcart-action-group {
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
+  margin-top: 0.5rem;
 }
+
 
 /* Imagen del producto */
 .shoppingcart-product-image {
@@ -352,28 +379,47 @@ h2 {
   object-fit: cover;
   border-radius: 1rem;
   border: 0.2rem solid black;
+  flex-shrink: 0;
 }
 
 /* Lista de productos */
-ul {
+.shoppingcart-ul {
   list-style-type: none;
   padding: 0;
+  
 }
 
-li {
+.shoppingcart-li {
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 10px 0;
   padding: 10px;
-  background: #f4f4f4;
+  max-width: 50rem;
+  background: white;
   border-radius: 5px;
+}
+.shoppingcart-product-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.shoppingcart-pagination-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center; 
+  margin-top: 1rem; 
+  gap: 1rem; 
 }
 
 /* Controles de cantidad */
 .shoppingcart-quantity-controls {
   display: flex;
   align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem;
 }
 
 .shoppingcart-quantity-input {
@@ -388,7 +434,7 @@ li {
 .shoppingcart-button-quantity {
   cursor: pointer;
   padding: 5px 10px;
-  background-color: #D9D9D9;
+  background-color: #F7F7F7;
   border: none;
   border-radius: 5px;
   margin-top: 10px;
@@ -398,7 +444,9 @@ li {
 .button-container {
   display: flex;
   justify-content: center;
-  margin-top: 20px;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 2rem;
 }
 
 .shoppingcart-button-confirm {
@@ -437,12 +485,21 @@ li {
 .shoppingcart-button-clean:hover {
   background-color: #019bac;
 }
+.shoppingcart-button-pagination:disabled,
+.shoppingcart-button-clean:disabled {
+  background-color: #F7F7F7;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
 
 /* Botones específicos */
 .shoppingcart-delete-btn {
+  width: 5rem;
   background-color: #dc3545;
+  color: white;
   font-family: "Keania One", sans-serif;
   border-radius: 0.3rem;
+  align-self: center; 
 }
 
 .shoppingcart-clear-btn {
@@ -550,7 +607,7 @@ p {
     margin-bottom: 2rem;
   }
 
-  li {
+  .shoppingcart-li {
     flex-direction: column;
     align-items: center;
     text-align: center;
@@ -564,7 +621,15 @@ p {
     flex-direction: row;
     justify-content: center;
   }
+  .shoppingcart-pagination-controls {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
+  .shoppingcart-page-info {
+    font-size: 0.9rem;
+    text-align: center;
+  }
   .button-container {
     flex-direction: column;
     align-items: center;
@@ -584,7 +649,3 @@ p {
   }
 }
 </style>
-
-  
-  
-  

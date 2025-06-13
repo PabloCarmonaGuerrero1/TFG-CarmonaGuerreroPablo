@@ -1,5 +1,5 @@
 <template>
-    <div class="homepage-notifications-container">
+  <div class="homepage-notifications-container">
     <div v-for="notification in notifications" :key="notification.id" 
          :class="['homepage-notification', notification.type]">
       {{ notification.message }}
@@ -9,28 +9,26 @@
     <h1 class="homepage-title">Search Products</h1>
     <form @submit.prevent="fetchProducts" class="homepage-filter-form">
       <div class="homepage-filter-group">
-        <label for="search-name">Name:</label>
+        <label for="search-name">Name</label>
         <input type="text" id="search-name" v-model="filters.name" class="homepage-filter-input" placeholder="Search Name">
       </div>
 
       <div class="homepage-filter-group">
-        <label for="main-meals">Main Meals:</label>
+        <label for="main-meals">Main Meals</label>
         <select id="main-meals" v-model="filters.main_meals" class="homepage-filter-input">
-          <option value="">All</option>
           <option v-for="meal in uniqueMainMeals" :key="meal" :value="meal">{{ meal }}</option>
         </select>
       </div>
 
       <div class="homepage-filter-group">
-        <label for="diet">Diet:</label>
+        <label for="diet">Diet</label>
         <select id="diet" v-model="filters.diet" class="homepage-filter-input">
-          <option value="">All</option>
           <option v-for="diet in uniqueDiets" :key="diet" :value="diet">{{ diet }}</option>
         </select>
       </div>
 
       <div class="homepage-filter-group">
-        <label for="allergens">Allergens (Exclude):</label>
+        <label for="allergens">Allergens (Exclude)</label>
         <multiselect id="allergens" v-model="filters.allergens" :options="uniqueAllergens" 
           :multiple="true" :close-on-select="false" :clear-on-select="false" 
           placeholder="Select allergens" class="homepage-filter-input">
@@ -43,7 +41,6 @@
       </div>
 
       <div class="homepage-filter-buttons">
-        <button type="submit" class="homepage-button">Search</button>
         <div class="pagination" v-if="totalPages > 1">
           <button @click="prevPage" :disabled="currentPage === 1" class="homepage-pagination-button">Previous</button>
           <span>Page {{ currentPage }} of {{ totalPages }}</span>
@@ -96,6 +93,8 @@ export default {
         allergens: [],
         price: 50,
       },
+      isLoggedIn: false,
+      currentUser: null,
       products: [],
       cart: {}, 
       uniqueMainMeals: [],
@@ -108,12 +107,48 @@ export default {
     };
   },
   computed: {
-    totalPages() {
-      return Math.ceil(this.products.length / this.itemsPerPage);
+    filteredProducts() {
+      return this.products.filter(product => {
+        const matchesName =
+          this.filters.name === '' ||
+          product.name.toLowerCase().includes(this.filters.name.toLowerCase());
+
+        const productMeal = product.main_meals || '';
+        const selectedMeal = this.filters.main_meals;
+        const matchesMeal =
+          selectedMeal === '' ||
+          selectedMeal === 'All' ||
+          productMeal === 'All' ||
+          productMeal === selectedMeal;
+
+        const matchesDiet =
+          this.filters.diet === '' || product.diet === this.filters.diet;
+
+        const matchesPrice = product.price <= this.filters.price;
+
+        const productAllergens = product.allergens
+        ? product.allergens.split(',').map(a => a.trim().toLowerCase())
+        : [];
+
+        const matchesAllergens = this.filters.allergens.every(
+        exclude => !productAllergens.includes(exclude.toLowerCase())
+        );
+
+        return (
+          matchesName &&
+          matchesMeal &&
+          matchesDiet &&
+          matchesPrice &&
+          matchesAllergens
+        );
+      });
     },
     paginatedProducts() {
       const start = (this.currentPage - 1) * this.itemsPerPage;
-      return this.products.slice(start, start + this.itemsPerPage);
+      return this.filteredProducts.slice(start, start + this.itemsPerPage);
+    },
+    totalPages() {
+      return Math.ceil(this.filteredProducts.length / this.itemsPerPage);
     }
   },
   methods: {
@@ -126,47 +161,43 @@ export default {
       }, 3000);
     },
     async fetchProducts() {
-      const params = {};
-      if (this.filters.name) params.name = this.filters.name;
-      if (this.filters.main_meals) params.main_meals = this.filters.main_meals;
-      if (this.filters.diet) params.diet = this.filters.diet;
-      if (this.filters.allergens.length > 0) params.allergens = this.filters.allergens.join(',');
-      if (this.filters.price !== 50) params.price = this.filters.price;
-      
-      const response = await axios.get('http://127.0.0.1:8000/api/products/search', { params });
-      this.products = response.data;
-      const mainMealsSet = new Set();
-      const dietsSet = new Set();
-      const allergensSet = new Set();
-      this.products.forEach(product => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/product/');
+        this.products = response.data;
+
+        const mainMealsSet = new Set();
+        const dietsSet = new Set();
+        const allergensSet = new Set();
+
+        this.products.forEach(product => {
         if (product.main_meals) mainMealsSet.add(product.main_meals);
         if (product.diet) dietsSet.add(product.diet);
         if (product.allergens) {
-          product.allergens.split(',').forEach(allergen => allergensSet.add(allergen.trim()));
+          product.allergens.split(',').forEach(allergen => {
+            const trimmed = allergen.trim().toLowerCase();
+            if (trimmed && trimmed !== 'none') {
+              allergensSet.add(trimmed);
+            }
+          });
         }
       });
       this.uniqueMainMeals = [...mainMealsSet];
       this.uniqueDiets = [...dietsSet];
       this.uniqueAllergens = [...allergensSet];
       this.currentPage = 1;
-    },
-
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    }
+  },
     async fetchCart() {
-      const storedUsername = localStorage.getItem('username');
-      if (!storedUsername) return;
-      
+      if (!this.currentUser) return;
       try {
-        const responseUser = await axios.get(`http://localhost:8000/api/users/search/${storedUsername}`);
-        const username = responseUser.data.id.toString();
-        
-        const cartResponse = await axios.get(`http://localhost:8000/api/shopping_cart/${username}`);
+        const userId = this.currentUser.id.toString();
+        const cartResponse = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}`);
         const cartData = cartResponse.data.data;
-        console.log(cartData)
         this.cartProductIds = cartData.map(item => item.product_id);
-
-        console.log(this.cartProductIds)
       } catch (error) {
-        console.error("Error al obtener el carrito", error);
+        console.error('Error al obtener el carrito', error);
       }
     },
 
@@ -193,28 +224,25 @@ export default {
     },
 
     async addToCart(product) {
+      if (!this.isLoggedIn || !this.currentUser) {
+        this.showNotification('⚠️ Requires login', 'error');
+        return;
+      }
+
+      const userId = this.currentUser.id.toString();
+      const quantity = this.cart[product.id] || 1;
+      const totalPrice = product.price * quantity;
+
       try {
-        const storedUsername = localStorage.getItem('username');
-        if (!storedUsername) {
-          this.showNotification("⚠️ Requires login", "error");
-          return;
-        }
-
-        const responseUser = await axios.get(`http://localhost:8000/api/users/search/${storedUsername}`);
-        const username = responseUser.data.id.toString();
-        const quantity = this.cart[product.id] || 1;
-        const totalPrice = product.price * quantity;
-
         let existingCartItem = null;
         try {
-          const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${username}/${product.id}`);
+          const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${product.id}`);
           existingCartItem = responseCart.data;
         } catch (error) {
           if (error.response && error.response.status === 404) {
             existingCartItem = null;
           }
         }
-
         if (existingCartItem) {
           const updatedQuantity = existingCartItem.amount + quantity;
           await axios.put(`http://localhost:8000/api/shopping_cart/${existingCartItem.id}`, {
@@ -224,7 +252,7 @@ export default {
           this.showNotification(`+${quantity} ${product.name} added. Now you have ${updatedQuantity}.`, 'success');
         } else {
           const cartData = {
-            user_id: username,
+            user_id: userId,
             product_id: product.id.toString(),
             amount: quantity,
             total_price: totalPrice
@@ -232,53 +260,51 @@ export default {
           await axios.post('http://localhost:8000/api/shopping_cart', cartData);
           this.showNotification(`+${quantity} ${product.name} added to cart.`, 'success');
         }
-
         this.cart[product.id] = null;
-        this.fetchCart(); 
+        this.fetchCart();
       } catch (error) {
-        console.error("Error al agregar al carrito:", error);
+        console.error('Error al agregar al carrito:', error);
       }
     },
 
     async removeFromCart(productId, quantityToRemove) {
-  try {
-    const storedUsername = localStorage.getItem('username');
-    if (!storedUsername) {
-      this.showNotification("⚠️ Requires login", "error");
-      return;
-    }
+      if (!this.isLoggedIn || !this.currentUser) {
+        this.showNotification('⚠️ Requires login', 'error');
+        return;
+      }
 
-    const responseUser = await axios.get(`http://localhost:8000/api/users/search/${storedUsername}`);
-    const username = responseUser.data.id.toString();
+      const userId = this.currentUser.id.toString();
 
-    const existingCartItem = await axios.get(`http://localhost:8000/api/shopping_cart/${username}/${productId}`);
-    if (!existingCartItem.data) {
-      alert("Item not found in cart!");
-      return;
-    }
+      try {
+        const existingCartItem = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${productId}`);
+        if (!existingCartItem.data) {
+          alert('Item not found in cart!');
+          return;
+        }
 
-    const product = this.products.find(p => p.id.toString() === productId.toString());
-    const productName = product ? product.name : 'Producto desconocido';
+        const product = this.products.find(p => p.id.toString() === productId.toString());
+        const productName = product ? product.name : 'Unknown Product';
 
-    const currentQuantity = existingCartItem.data.amount;
-    if (quantityToRemove >= currentQuantity) {
-      await axios.delete(`http://localhost:8000/api/shopping_cart/${existingCartItem.data.id}`);
-      delete this.cart[productId];
-      this.showNotification(`-${currentQuantity} ${productName} deleted. No longer in your cart.`, 'error');
-    } else {
-      const updatedQuantity = currentQuantity - quantityToRemove;
-      await axios.put(`http://localhost:8000/api/shopping_cart/${existingCartItem.data.id}`, {
-        amount: updatedQuantity,
-        total_price: updatedQuantity * existingCartItem.data.total_price / currentQuantity,
-      });
-      this.showNotification(`-${quantityToRemove} ${productName} removed. Now you have ${updatedQuantity}.`, 'error');
-    }
-    this.fetchCart();
-  } catch (error) {
-    console.error("Error al eliminar del carrito:", error);
-  }
-},
+        const currentQuantity = existingCartItem.data.amount;
 
+        if (quantityToRemove >= currentQuantity) {
+          await axios.delete(`http://localhost:8000/api/shopping_cart/${existingCartItem.data.id}`);
+          delete this.cart[productId];
+          this.showNotification(`-${currentQuantity} ${productName} deleted. No longer in your cart.`, 'error');
+        } else {
+          const updatedQuantity = currentQuantity - quantityToRemove;
+          await axios.put(`http://localhost:8000/api/shopping_cart/${existingCartItem.data.id}`, {
+            amount: updatedQuantity,
+            total_price: updatedQuantity * existingCartItem.data.total_price / currentQuantity
+          });
+          this.showNotification(`-${quantityToRemove} ${productName} removed. Now you have ${updatedQuantity}.`, 'error');
+        }
+
+        this.fetchCart();
+      } catch (error) {
+        console.error('Error removing item from cart:', error);
+      }
+    },
 
     saveProductName(productName) {
       localStorage.setItem('selectedProduct', productName);
@@ -293,6 +319,7 @@ export default {
         allergens: [],
         price: 50,
       };
+      this.currentPage = 1;
       this.fetchProducts();
     },
 
@@ -303,14 +330,41 @@ export default {
       if (this.currentPage < this.totalPages) this.currentPage++;
     }
   },
+  async mounted() {
+    await this.fetchProducts();
+    this.showNotification('ℹ️ If you click on a product image, you can see its information.', 'info');
 
-  mounted() {
-    this.fetchProducts();
-    this.fetchCart(); 
-    this.showNotification("ℹ️ If you click on a product image, you can see its information.", "info");
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const response = await fetch('http://localhost:8000/api/me', {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        if (!data.error) {
+          this.currentUser = data;
+          this.isLoggedIn = true;
+          await this.fetchCart();
+        }
+      } catch (error) {
+        console.error('Error al verificar token:', error);
+      }
+    }
+  },
+  watch: {
+    filters: {
+      handler() {
+        this.currentPage = 1;
+        this.fetchProducts();
+      },
+      deep: true
+    }
   }
 };
 </script>
+
 
 <style>
 /* Importación de estilos externos */
@@ -320,7 +374,7 @@ export default {
 /* Contenedor principal de la página */
 .Homepage {
   max-width: 80vw;
-  min-height: 135vh;
+  min-height: 105vh;
   margin: 0 auto;
   padding: 1rem;
   font-family: "Keania One", sans-serif;
@@ -345,11 +399,13 @@ export default {
   flex-direction: column;
   align-items: center;
 }
-
+.homepage-filter-group label{
+  font-size: 1.2rem;
+}
 .homepage-filter-input {
   width: 14rem;
   height: 2.5rem;
-  background-color: rgb(136, 136, 136);
+  background-color: #F7F7F7;
   color: black;
   border-radius: 0.3rem;
   text-align: center;
@@ -366,12 +422,15 @@ export default {
 .homepage-filter-buttons {
   display: flex;
   justify-content: center;
+  flex-direction: column;
   width: 100%;
   margin: 1rem auto;
 }
 
 .homepage-button {
-  margin: 0 1rem;
+  width: 5rem;
+  align-self: center;
+  margin-top: 1rem;
   background-color: #00E5FF;
   color: black;
   border: none;
@@ -412,7 +471,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: center;
-  background-color: grey;
+  background-color: #F7F7F7;
   padding: 1rem 0;
   text-align: center;
   border-radius: 1rem;

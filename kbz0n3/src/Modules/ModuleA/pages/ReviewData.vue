@@ -123,7 +123,8 @@ body {
 .reviews-search-form {
   width: 30%;
   height: 25rem;
-  background-color: #D9D9D9;
+  margin-left: 3rem;
+  background-color: #F7F7F7;
   padding: 1rem;
   border-radius: 1rem;
   display: flex;
@@ -159,7 +160,7 @@ body {
 
 /* Tarjetas de reseñas */
 .review-card {
-  background-color: #D9D9D9;
+  background-color: #F7F7F7;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -247,7 +248,7 @@ button {
 }
 
 button:disabled {
-  background-color: #ccc;
+  background-color: #F7F7F7;
   cursor: not-allowed;
 }
 

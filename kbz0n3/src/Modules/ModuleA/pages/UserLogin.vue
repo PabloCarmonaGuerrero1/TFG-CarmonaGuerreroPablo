@@ -52,30 +52,30 @@ export default {
     };
   },
   methods: {
-    async loginUser() {
-      try {
-        const apiUrl = `http://localhost:8000/api/users/search/${this.username}`;
-        const response = await axios.get(apiUrl);
+async loginUser() {
+  this.errors.username = "";
+  this.errors.password = "";
 
-        if (response.data) {
-          const user = response.data;
-          if (user.password === this.password) {
-            localStorage.setItem("username", this.username);
-            this.$router.push("/homepage");
-          } else {
-            this.errors.password = "Incorrect password.";
-            this.errors.username = "";
-          }
-        }
-      } catch (error) {
-        if (error.response && error.response.status === 404) {
-          this.errors.username = "User not found.";
-          this.errors.password = "";
-        } else {
-          console.error("Error:", error);
-        }
-      }
-    },
+  try {
+    const response = await axios.post("http://localhost:8000/api/login", {
+      username: this.username,
+      password: this.password,
+    });
+
+    const { token} = response.data;
+
+    localStorage.setItem("token", token);
+
+    this.$router.push("/homepage");
+  } catch (error) {
+    if (error.response && error.response.status === 401) {
+      this.errors.password = "Incorrect username or password.";
+    } else {
+      console.error("Login error:", error);
+    }
+  }
+}
+,
     async getImage() {
       try {
         const apiUrl = `http://localhost:8000/api/product`;
@@ -174,7 +174,7 @@ export default {
   padding: 1rem;
   border: none;
   border-radius: 0.9375rem;
-  background: rgba(0, 0, 0, 0.1);
+  background: #F7F7F7;
   text-align: center;
   font-size: 1.5rem;
   font-family: "Keania One", sans-serif;

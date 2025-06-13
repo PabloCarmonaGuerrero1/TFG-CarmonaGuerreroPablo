@@ -49,7 +49,7 @@
 /* Secciones de información */
 .info-whatis, .info-gamestoday {
     font-family: "Keania One", sans-serif;
-    background-color: #D9D9D9;
+    background-color: #F7F7F7;
     padding: 2rem;
     border-radius: 1rem;
     box-shadow: 0 0.25rem 0.375rem rgba(0, 0, 0, 0.1);

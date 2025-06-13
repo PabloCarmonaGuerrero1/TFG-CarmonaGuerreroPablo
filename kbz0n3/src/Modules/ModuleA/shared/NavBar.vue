@@ -27,7 +27,7 @@ export default {
   },
   methods: {
     checkLoginStatus() {
-      this.isLoggedIn = localStorage.getItem('username') !== null;
+      this.isLoggedIn = localStorage.getItem('token') !== null;
     },
   },
   watch: {

@@ -29,7 +29,6 @@
 
 
 .Footer .copyright {
-  fontcolor: black;
   font-size: 1rem;
   padding-right: 1.5rem;
 }

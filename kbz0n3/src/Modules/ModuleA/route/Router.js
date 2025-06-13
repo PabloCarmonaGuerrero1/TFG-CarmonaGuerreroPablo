@@ -14,10 +14,8 @@ const routes = [
             { path: "reviewpage", component: () => import("../pages/ReviewPage.vue") },
             { path: "profile", component: () => import("../pages/User_Profile.vue") },
             { path: "shoppingcart", component: () => import("../pages/ShoppingCart.vue") },
-            { path: "adminedits", component: () => import("../pages/AdminEdits.vue") },         
-            { path: '/:pathMatch(.*)*', component: () => import("../pages/NotFound.vue") 
-            }
-            
+            { path: "adminedits", component: () => import("../pages/AdminEdits.vue") },
+            { path: '/:pathMatch(.*)*', component: () => import("../pages/NotFound.vue") }
         ]
     },
 ];
@@ -27,20 +25,32 @@ const router = createRouter({
     routes,
 });
 
-const checkUserExists = async (username) => {
+let userData = null;
+const token = localStorage.getItem("token");
+
+const fetchUserData = async () => {
+    if (!token) return null;
     try {
-        const response = await fetch(`http://localhost:8000/api/users/search/${username}`);
-        return response.ok; 
+        const res = await fetch("http://localhost:8000/api/me", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        const data = await res.json();
+        console.log(data)
+        if (data.error) return null;
+        return data;
+        
     } catch (error) {
-        console.error("Error al verificar usuario:", error);
-        return false;
+        console.error("Error validando token:", error);
+        return null;
     }
 };
 
 const checkProductExists = async (productId) => {
     try {
         const response = await fetch(`http://localhost:8000/api/product/${productId}`);
-        return response.ok; 
+        return response.ok;
     } catch (error) {
         console.error("Error al verificar producto:", error);
         return false;
@@ -48,27 +58,32 @@ const checkProductExists = async (productId) => {
 };
 
 router.beforeEach(async (to, from, next) => {
-    const storedUsername = localStorage.getItem('username');
-    const selectedProduct = localStorage.getItem('selectedProduct'); 
+    if (!userData) {
+        userData = await fetchUserData();
+    }
 
     const protectedRoutes = ["/profile", "/reviewpage", "/shoppingcart"];
-    
+    const adminOnlyRoutes = ["/adminedits"];
+    console.log(userData.name)
+
     if (protectedRoutes.includes(to.path)) {
-        const userExists = storedUsername ? await checkUserExists(storedUsername) : false;
-        
-        if (!userExists) {
-            localStorage.removeItem('username'); 
-            return next('/'); 
+        if (!userData) {
+            return next("/");
+        }
+    }
+
+    if (adminOnlyRoutes.includes(to.path)) {
+        if (!userData || userData.name !== "Paco") {
+            return next("/homepage");
         }
     }
 
     if (to.path === "/product-info") {
-
-        const productExists = selectedProduct ? await checkProductExists(selectedProduct) : false;
-        
-        if (!productExists) {
-            localStorage.removeItem('selectedProduct'); 
-            return next('/homepage'); 
+        const selectedProduct = localStorage.getItem('selectedProduct');
+        const exists = selectedProduct ? await checkProductExists(selectedProduct) : false;
+        if (!exists) {
+            localStorage.removeItem('selectedProduct');
+            return next('/homepage');
         }
     }
 

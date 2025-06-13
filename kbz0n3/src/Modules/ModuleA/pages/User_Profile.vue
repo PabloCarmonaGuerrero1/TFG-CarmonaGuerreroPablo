@@ -71,15 +71,16 @@ export default {
   data() {
     return {
       username: "",
-      id:"",
+      id: "",
       DNI: "",
       number: "",
       adress: "",
       password: "",
       repeat: "",
-      fav_drink:"",
-      fav_food:"",
+      fav_drink: "",
+      fav_food: "",
       favoriteProducts: [],
+      currentUser: null, 
       errors: {
         username: "",
         DNI: "",
@@ -91,70 +92,72 @@ export default {
       },
       submitDisabled: false,
       defaultImage: defaultImage,
-      selectedProduct: null,  
-      notificationMessage: "", 
-      notificationType: "", 
+      selectedProduct: null,
+      notificationMessage: "",
+      notificationType: "",
     };
   },
   methods: {
     async getUserInfo() {
       try {
-        const storedUsername = localStorage.getItem('username');
-        if (!storedUsername) {
-          console.error("No username found in localStorage.");
-          return;
-        }
-        const apiUrl = `http://localhost:8000/api/users/search/${storedUsername}`;
-        const response = await axios.get(apiUrl);
+        const token = localStorage.getItem("token");
+        if (!token) return;
 
-        if (response.data) {
-          this.username = response.data.name || "";
-          this.DNI = response.data.DNI || "";
-          this.number = response.data.number || "";
-          this.adress = response.data.adress || "";
-          this.id = response.data.id || "";
-          this.userpassword = response.data.password || "";
-          this.fav_drink = response.data.fav_drink || "";
-          this.fav_food = response.data.fav_food || "";
-        }
+        const response = await fetch("http://localhost:8000/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        const data = await response.json();
+        if (!data || data.error) return;
+
+        this.currentUser = data;
+        this.id = data.id;
+        this.username = data.name || "";
+        this.DNI = data.DNI || "";
+        this.number = data.number || "";
+        this.adress = data.adress || "";
+        this.fav_drink = data.fav_drink || "";
+        this.fav_food = data.fav_food || "";
+
         this.loadFavoriteProducts();
       } catch (error) {
-        console.error('Error fetching user information:', error);
+        console.error("Error fetching user info:", error);
       }
-    },     
+    },
+
     async loadFavoriteProducts() {
       try {
         const productIds = [this.fav_drink, this.fav_food];
-        
-        const productRequests = productIds.map(id => 
-          id !== "nothing" ? axios.get(`http://localhost:8000/api/product/${id}`) : null
-        ).filter(request => request !== null); 
-        
-        const responses = await Promise.all(productRequests);
-        
-        this.favoriteProducts = responses.map(response => ({
-          id: response.data.id,
-          name: response.data.name,
-          imageUrl: response.data.image || this.defaultImage 
+        const requests = productIds
+          .map(id => id !== "nothing" ? axios.get(`http://localhost:8000/api/product/${id}`) : null)
+          .filter(req => req !== null);
+
+        const responses = await Promise.all(requests);
+        this.favoriteProducts = responses.map(res => ({
+          id: res.data.id,
+          name: res.data.name,
+          imageUrl: res.data.image || this.defaultImage,
         }));
-        
+
         if (this.fav_drink === "nothing") {
           this.favoriteProducts.push({
             id: "nothing_drink",
             name: "No favorite drink",
-            imageUrl: this.defaultImage
+            imageUrl: this.defaultImage,
           });
         }
+
         if (this.fav_food === "nothing") {
           this.favoriteProducts.push({
             id: "nothing_food",
             name: "No favorite food",
-            imageUrl: this.defaultImage
+            imageUrl: this.defaultImage,
           });
         }
-        
       } catch (error) {
-        console.error('Error loading favorite products:', error);
+        console.error("Error loading favorite products:", error);
       }
     },
 
@@ -166,17 +169,14 @@ export default {
       this.validatePassword();
       this.validateRepeat();
       this.validateUsernameAvailability();
+
       if (!this.submitDisabled) {
         this.updateUser();
       }
     },
-    selectProduct(productId) {
-      localStorage.setItem('selectedProduct', productId);
-      this.$router.push('/product-info');
-    },
+
     async updateUser() {
       try {
-        const apiUrl = `http://localhost:8000/api/users/${this.id}`;
         const userData = {
           name: this.username,
           DNI: this.DNI,
@@ -186,118 +186,105 @@ export default {
           fav_food: this.fav_food,
           fav_drink: this.fav_drink,
         };
-
         if (this.password) {
           userData.password = this.password;
         }
 
-        localStorage.setItem("username", this.username);
-        const response = await axios.put(apiUrl, userData);
-        console.log('Respuesta del servidor:', response.data);
-
+        await axios.put(`http://localhost:8000/api/users/${this.id}`, userData);
         this.showNotification("Profile updated successfully", "success");
 
       } catch (error) {
-        console.error('Error al actualizar usuario:', error);
+        console.error("Error updating user:", error);
         this.showNotification("Error updating profile", "error");
       }
     },
+
     async validateUsernameAvailability() {
       try {
-        const storedUsername = localStorage.getItem('username');
-
-        if (this.username === storedUsername) {
-            this.errors.usernameTaken = '';
-        return;
+        if (!this.currentUser || this.username === this.currentUser.name) {
+          this.errors.usernameTaken = "";
+          return;
         }
-        const apiUrl = `http://localhost:8000/api/users/search/${this.username}`;
-        await axios.get(apiUrl);
 
-        this.errors.usernameTaken = 'Username is already taken';
+        await axios.get(`http://localhost:8000/api/users/search/${this.username}`);
+        this.errors.usernameTaken = "Username is already taken";
       } catch (error) {
         if (error.response && error.response.status === 404) {
-          this.errors.usernameTaken = ''; 
+          this.errors.usernameTaken = "";
         } else {
-          this.errors.usernameTaken = 'Error checking username availability';
-          console.error('Error checking username availability:', error);
+          this.errors.usernameTaken = "Error checking username availability";
         }
       }
     },
+
     validateName() {
-      const namelength = this.username.replace(/\s/g, '').length;
-      if (namelength < 4 || namelength > 12){
-        this.errors.username = 'Username must be at least 4 characters long';
-        this.errors.usernameTaken = ''; 
-      } else {
-        this.errors.username = '';
-      }
+      const length = this.username.replace(/\s/g, "").length;
+      this.errors.username = length < 4 || length > 12 ? "Username must be at least 4 characters long" : "";
       this.updateSubmitDisabled();
     },
     validateDNI() {
-        if (!this.DNI.match(/^\d{8}[A-Z]$/)) {
-            this.errors.DNI = "DNI must be 8 digits followed by a capital letter (e.g., 12345678A)";
-        } else {
-            this.errors.DNI = "";
-        }
-        this.updateSubmitDisabled();
+      this.errors.DNI = !/^\d{8}[A-Z]$/.test(this.DNI)
+        ? "DNI must be 8 digits followed by a capital letter (e.g., 12345678A)"
+        : "";
+      this.updateSubmitDisabled();
     },
     validatePhoneNumber() {
-      if (!this.number.match(/^\d{9,15}$/)) {
-        this.errors.number = "Phone number must be between 9 and 15 digits";
-      } else {
-        this.errors.number = "";
-      }
+      this.errors.number = !/^\d{9,15}$/.test(this.number)
+        ? "Phone number must be between 9 and 15 digits"
+        : "";
       this.updateSubmitDisabled();
     },
     validateAdress() {
-      if (this.adress.length < 5) {
-        this.errors.adress = "Address must be at least 5 characters";
-      } else {
-        this.errors.adress = "";
-      }
+      this.errors.adress = this.adress.length < 5 ? "Address must be at least 5 characters" : "";
       this.updateSubmitDisabled();
     },
     validatePassword() {
-  if (this.password && (this.password.length < 8 || this.password.includes(" "))) {
-    this.errors.password = "Password must be at least 8 characters long and cannot contain spaces";
-  } else {
-    this.errors.password = ""; 
-  }
-  this.updateSubmitDisabled();
-},
-
+      this.errors.password = this.password && (this.password.length < 8 || this.password.includes(" "))
+        ? "Password must be at least 8 characters and cannot contain spaces"
+        : "";
+      this.updateSubmitDisabled();
+    },
     validateRepeat() {
-        if (this.password && this.password !== this.repeat) {
-        this.errors.repeat = "Passwords do not match";
-    } else {
-        this.errors.repeat = ""; 
-    }
-        this.updateSubmitDisabled();
+      this.errors.repeat = this.password && this.password !== this.repeat
+        ? "Passwords do not match"
+        : "";
+      this.updateSubmitDisabled();
     },
+
     updateSubmitDisabled() {
-        this.submitDisabled = Object.values(this.errors).some(error => error !== '');
+      this.submitDisabled = Object.values(this.errors).some(err => err !== "");
     },
+
+    selectProduct(productId) {
+      localStorage.setItem("selectedProduct", productId);
+      this.$router.push("/product-info");
+    },
+
     logout() {
-        localStorage.removeItem("username"); 
-        this.$router.push("/");  
-        this.showNotification("Logged out successfully", "logout");
-            
-    },    
+      localStorage.removeItem("token");
+      this.$router.push("/");
+      this.showNotification("Logged out successfully", "logout");
+    },
+
     showNotification(message, type) {
       this.notificationMessage = message;
       this.notificationType = type;
-      
       setTimeout(() => {
         this.notificationMessage = "";
         this.notificationType = "";
       }, 3000);
     },
-},
-  mounted() {
-    this.getUserInfo(); 
   },
+
+  mounted() {
+    this.getUserInfo();
+  },
+
   watch: {
-    username: "validateName",
+    username() {
+      this.validateName();
+      this.validateUsernameAvailability(); 
+    },
     DNI: "validateDNI",
     number: "validatePhoneNumber",
     adress: "validateAdress",
@@ -306,6 +293,7 @@ export default {
   },
 };
 </script>
+
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Keania+One&display=swap");
@@ -327,7 +315,7 @@ export default {
   padding: 1rem;
   border-radius: 1rem;
   text-align: center;
-  background-color: #D9D9D9;
+  background-color: #F7F7F7;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -340,7 +328,7 @@ export default {
   height: 35rem;
   padding: 1rem;
   border-radius: 1rem;
-  background-color: #D9D9D9;
+  background-color: #F7F7F7;
   text-align: center;
   display: flex;
   flex-direction: column;
@@ -404,7 +392,7 @@ export default {
 }
 
 .profile-botton-logout:hover {
-  background-color: rgb(168, 0, 0);
+  background-color: rgb(180, 0, 0);
   color: white;
 }
 

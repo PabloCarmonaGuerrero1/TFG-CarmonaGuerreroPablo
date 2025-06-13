@@ -73,13 +73,14 @@ export default {
       cartQuantity: 0,
       productId: 1,
       quantityInput: 0,
-      TypeOfProduct:"",
-      main_meals:"", 
+      TypeOfProduct: "",
+      main_meals: "",
       isFavorite: false,
+      currentUser: null, 
       notification: {
         show: false,
         message: "",
-        type: "", 
+        type: "",
       },
     };
   },
@@ -88,17 +89,15 @@ export default {
       try {
         this.productId = localStorage.getItem('selectedProduct');
         const response = await axios.get(`http://localhost:8000/api/product/${this.productId}`);
-
-        if (response.data) {
-          this.name = response.data.name;
-          this.price = response.data.price;
-          this.description = response.data.description;
-          this.image = response.data.image;
-          this.allergens = response.data.allergens;
-          this.diet = response.data.diet;
-          this.TypeOfProduct=response.data.TypeOfProduct;
-          this.main_meals=response.data.main_meals;
-        }
+        const data = response.data;
+        this.name = data.name;
+        this.price = data.price;
+        this.description = data.description;
+        this.image = data.image;
+        this.allergens = data.allergens;
+        this.diet = data.diet;
+        this.TypeOfProduct = data.TypeOfProduct;
+        this.main_meals = data.main_meals;
 
         await this.fetchCartQuantity();
       } catch (error) {
@@ -107,64 +106,57 @@ export default {
     },
 
     async fetchCartQuantity() {
+      if (!this.currentUser) return;
       try {
-        const storedUsername = localStorage.getItem('username');
-        if (!storedUsername) return;
-
-        const responseUser = await axios.get(`http://localhost:8000/api/users/search/${storedUsername}`);
-        const username = responseUser.data.id.toString();
-
-        const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${username}/${this.productId}`);
+        const userId = this.currentUser.id;
+        const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${this.productId}`);
         this.cartQuantity = responseCart.data.amount || 0;
-      } catch (error) {
+      } catch {
         this.cartQuantity = 0;
       }
     },
 
     async addToCart() {
+      if (!this.currentUser) {
+        this.showNotification("⚠️ Requires login", "error");
+        return;
+      }
+
       if (this.quantityInput < 1) {
         this.showNotification("⚠️ Enter a valid amount.", "error");
         return;
       }
 
       try {
-        const storedUsername = localStorage.getItem('username');
-        if (!storedUsername) {
-          this.showNotification("⚠️ Requires login", "error");
-          return;
-        }
-
-        const responseUser = await axios.get(`http://localhost:8000/api/users/search/${storedUsername}`);
-        const username = responseUser.data.id.toString();
+        const userId = this.currentUser.id.toString();
         const quantity = this.cartQuantity + this.quantityInput;
         const totalPrice = this.price * quantity;
 
         let existingCartItem = null;
         try {
-          const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${username}/${this.productId}`);
+          const responseCart = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${this.productId}`);
           existingCartItem = responseCart.data;
         } catch (error) {
-          if (error.response && error.response.status === 404) {
-            existingCartItem = null;
-          }
+          if (error.response && error.response.status === 404) existingCartItem = null;
         }
 
         if (existingCartItem) {
           const updatedQuantity = existingCartItem.amount + this.quantityInput;
           await axios.put(`http://localhost:8000/api/shopping_cart/${existingCartItem.id}`, {
             amount: updatedQuantity,
-            total_price: updatedQuantity * this.price
+            total_price: updatedQuantity * this.price,
           });
           this.showNotification(`+${this.quantityInput} ${this.name} added. Now you have ${updatedQuantity}.`, "success");
         } else {
           await axios.post("http://localhost:8000/api/shopping_cart", {
-            user_id: username,
+            user_id: userId,
             product_id: this.productId,
             amount: this.quantityInput,
-            total_price: totalPrice
+            total_price: totalPrice,
           });
           this.showNotification(`+${this.quantityInput} ${this.name} added to cart.`, "success");
         }
+
         this.quantityInput = 0;
         this.fetchCartQuantity();
       } catch (error) {
@@ -173,22 +165,19 @@ export default {
     },
 
     async removeFromCart() {
+      if (!this.currentUser) {
+        this.showNotification("⚠️ Requires login", "error");
+        return;
+      }
+
       if (this.quantityInput < 1) {
         this.showNotification("⚠️ Enter a valid amount.", "error");
         return;
       }
 
       try {
-        const storedUsername = localStorage.getItem('username');
-        if (!storedUsername) {
-          this.showNotification("⚠️ Requires login", "error");
-          return;
-        }
-
-        const responseUser = await axios.get(`http://localhost:8000/api/users/search/${storedUsername}`);
-        const username = responseUser.data.id.toString();
-
-        const existingCartItem = await axios.get(`http://localhost:8000/api/shopping_cart/${username}/${this.productId}`);
+        const userId = this.currentUser.id.toString();
+        const existingCartItem = await axios.get(`http://localhost:8000/api/shopping_cart/${userId}/${this.productId}`);
         if (!existingCartItem.data) {
           this.showNotification("Item not found in cart!", "error");
           return;
@@ -207,12 +196,50 @@ export default {
           });
           this.showNotification(`-${this.quantityInput} ${this.name} removed. Now you have ${updatedQuantity}.`, "error");
         }
+
         this.quantityInput = 0;
         this.fetchCartQuantity();
       } catch (error) {
         console.error("Error removing from cart:", error);
       }
     },
+
+    async checkIfFavorite() {
+      if (!this.currentUser) return;
+      try {
+        const favoriteField = this.TypeOfProduct === 'Food' ? 'fav_food' : 'fav_drink';
+        this.isFavorite = this.currentUser[favoriteField] === this.productId;
+      } catch (error) {
+        console.error("Error checking favorite status:", error);
+      }
+    },
+
+    async toggleFavorite() {
+      if (!this.currentUser) {
+        this.showNotification("⚠️ Requires login", "error");
+        return;
+      }
+
+      try {
+        const favoriteField = this.TypeOfProduct === 'Food' ? 'fav_food' : 'fav_drink';
+        const newFavoriteValue = this.isFavorite ? "nothing" : this.productId;
+
+        await axios.put(`http://localhost:8000/api/users/${this.currentUser.id}`, {
+          ...this.currentUser,
+          [favoriteField]: newFavoriteValue,
+        });
+
+        this.isFavorite = !this.isFavorite;
+        this.showNotification(
+          this.isFavorite ? `✅ ${this.name} marked as favorite!` : `❌ ${this.name} removed from favorites.`,
+          this.isFavorite ? "success" : "error"
+        );
+      } catch (error) {
+        console.error("Error setting favorite:", error);
+        this.showNotification("⚠️ Error al marcar favorito.", "error");
+      }
+    },
+
     showNotification(message, type) {
       this.notification.message = message;
       this.notification.type = type;
@@ -221,64 +248,40 @@ export default {
         this.notification.show = false;
       }, 3000);
     },
-        async checkIfFavorite() {
-      try {
-        const storedUsername = localStorage.getItem('username');
-        if (!storedUsername) return;
 
-        const responseUser = await axios.get(`http://localhost:8000/api/users/search/${storedUsername}`);
-        const userData = responseUser.data;
-        const favoriteField = this.TypeOfProduct === 'Food' ? 'fav_food' : 'fav_drink';
-        this.isFavorite = userData[favoriteField] === this.productId;
-      } catch (error) {
-        console.error("Error checking favorite status:", error);
-      }
+    increaseQuantity() {
+      this.quantityInput++;
     },
-    async toggleFavorite() {
-  try {
-    const storedUsername = localStorage.getItem('username');
-    if (!storedUsername) {
-      this.showNotification("⚠️ Requires login", "error");
-      return;
+
+    decreaseQuantity() {
+      if (this.quantityInput > 0) this.quantityInput--;
+    },
+  },
+
+  async mounted() {
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const response = await fetch("http://localhost:8000/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        });
+        const data = await response.json();
+        if (!data.error) {
+          this.currentUser = data;
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+      }
     }
 
-    const responseUser = await axios.get(`http://localhost:8000/api/users/search/${storedUsername}`);
-    const userData = responseUser.data;
-    const favoriteField = this.TypeOfProduct === 'Food' ? 'fav_food' : 'fav_drink';
-    const newFavoriteValue = this.isFavorite ? "nothing" : this.productId;
-
-    await axios.put(`http://localhost:8000/api/users/${userData.id}`, {
-      ...userData,
-      [favoriteField]: newFavoriteValue,
-    });
-
-    this.isFavorite = !this.isFavorite;
-    this.showNotification(
-      this.isFavorite ? `✅ ${this.name} marked as favorite!` : `❌ ${this.name} removed from favorites.`,
-      this.isFavorite ? "success" : "error" // 
-    );
-  } catch (error) {
-    console.error("Error setting favorite:", error);
-    this.showNotification("⚠️ Error al marcar favorito.", "error");
-  }
-}
-,
-  increaseQuantity() {
-    this.quantityInput++; 
-  },
-
-  decreaseQuantity() {
-    if (this.quantityInput > 0) {
-      this.quantityInput--; 
-    }
-  },
-  },
-  mounted() {
-    this.getProductInfo();
-    this.checkIfFavorite();
+    await this.getProductInfo();
+    await this.checkIfFavorite();
   }
 };
 </script>
+
 
 <style>
 

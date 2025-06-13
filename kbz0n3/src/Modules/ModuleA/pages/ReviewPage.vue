@@ -34,7 +34,7 @@
       </label>
 
       <label>
-        <p>Review (min 10 characters)</p>
+        <p>Review</p>
         <textarea v-model="review" @input="validateReview"></textarea>
         <div class="error" v-if="errors.review">{{ errors.review }}</div>
       </label>
@@ -111,10 +111,16 @@ export default {
     },
     async getUserInfo() {
       try {
-        const storedUsername = localStorage.getItem("username");
-        if (!storedUsername) return;
-
-        const apiUrl = `http://localhost:8000/api/users/search/${storedUsername}`;
+        const token = localStorage.getItem("token");
+        if (!token) return;
+          const response2 = await fetch("http://localhost:8000/api/me", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        const data = await response2.json();
+        const username = data.name;
+        const apiUrl = `http://localhost:8000/api/users/search/${username}`;
         const response = await axios.get(apiUrl);
 
         if (response.data) {
@@ -238,7 +244,7 @@ export default {
 
 /* Contenedor principal de reseñas */
 .review-container {
-  height: 90vh;
+  height: 70vh;
   margin: 8rem 0;
   display: flex;
   justify-content: space-around;
@@ -270,7 +276,7 @@ export default {
   padding: 15px;
   border: 1px solid #ddd;
   border-radius: 8px;
-  background-color: #f9f9f9;
+  background-color: #F7F7F7;
   text-align: center;
   font-family: "Keania One", sans-serif;
 }
@@ -300,7 +306,7 @@ export default {
 }
 
 .review-container button:disabled {
-  background-color: #ccc;
+  background-color: #F7F7F7;
   cursor: not-allowed;
 }
 

@@ -267,7 +267,6 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #0077FF;
   border-radius: 1rem;
   padding: 1rem;
 }
@@ -309,7 +308,7 @@ export default {
   padding: 1rem;
   border: none;
   border-radius: 0.9375rem;
-  background: rgba(0, 0, 0, 0.1);
+  background: #F7F7F7;
   text-align: center;
   font-size: 1rem;
   font-family: "Keania One", sans-serif;
