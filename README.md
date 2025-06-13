@@ -8,6 +8,6 @@ Por Pablo Carmona Guerrero
 
 [Enlace a github](https://github.com/PabloCarmonaGuerrero1/TFG-CarmonaGuerreroPablo) (Contiene el frontend y el backend para poder desplegarlo con Docker)
 
-[Enlace a github de despliegue de la API](https://github.com/PabloCarmonaGuerrero1/KBZ0N3API_Despliegue) (Backend usado para el despliegue de la API en Render es el mismo pero modificado para desplegarlo)
+[Enlace a github de despliegue de la API](https://github.com/PabloCarmonaGuerrero1/KBZ0N3API_Despliegue) (El backend utilizado para el despliegue de la API en Render es el mismo, pero con modificaciones para permitir su despliegue)
 
 [Enlace a figma](https://www.figma.com/design/QhIxcoIslxSYWM6dUUW20M/KBZ0N3?node-id=49-18&t=Q76qlUvqaKBlrauX-0)
