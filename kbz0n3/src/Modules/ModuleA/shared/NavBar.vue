@@ -8,6 +8,7 @@
       <router-link to="/homepage"><img src="../../../assets/icons/homepage.png" alt="homepage" /></router-link>
     </div>
     <div class="navbar-rightside">
+      <router-link v-if="isAdmin" to="/adminedits"><img src="../../../assets/icons/admin.png" alt="adminedits-page" /></router-link>
       <router-link to="/shoppingcart"><img src="../../../assets/icons/shoppingcart.png" alt="shoppingcart-page" /></router-link>
       <router-link v-if="!isLoggedIn" to="/"><img src="../../../assets/icons/login.png" alt="login-page" /></router-link>
       <router-link v-if="isLoggedIn" to="/profile"><img src="../../../assets/icons/user.png" alt="user-page" /></router-link>
@@ -20,19 +21,41 @@ export default {
   data() {
     return {
       isLoggedIn: false,
+      isAdmin : false,
     };
   },
   mounted() {
     this.checkLoginStatus();
+    this.checkAdminStatus();
   },
   methods: {
     checkLoginStatus() {
-      this.isLoggedIn = localStorage.getItem('token') !== null;
+      const token = localStorage.getItem('token');
+      this.isLoggedIn = token !== null;
+
+      if (this.isLoggedIn) {
+        this.checkAdminStatus(); 
+      } else {
+        this.isAdmin = false;
+      }
     },
+    async checkAdminStatus(){
+      const token = localStorage.getItem('token')
+      if (!token) return null;
+              const res = await fetch("http://localhost:8000/api/me", {
+            headers: {
+                "Authorization": `Bearer ${token}`
+            }
+        });
+        const data = await res.json();
+        if(data.name==="Paco"){
+          this.isAdmin=true;
+        }      
+    }
   },
   watch: {
     '$route'() {
-      this.checkLoginStatus(); 
+      this.checkLoginStatus();
     }
   }
 };

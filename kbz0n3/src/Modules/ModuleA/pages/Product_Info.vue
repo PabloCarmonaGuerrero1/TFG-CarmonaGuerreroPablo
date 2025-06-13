@@ -1,7 +1,7 @@
 <template>
   <div class="productinfo-container">
     <div class="productinfo-leftside">
-      <img :src="image" alt="Image from API KBZ0N3" class="productinfo-image">
+      <img :src="image" alt="Image from API KBZ0N3" class="productinfo-image" @error="onProductImageError">
       <button @click="toggleFavorite" :class="['productinfo-btn-favorite', isFavorite ? 'favorite' : 'not-favorite']">
         {{ isFavorite ? '💔 Remove favorite' : '❤️ Add favorite' }}
       </button>
@@ -30,7 +30,7 @@
         </div>
         <div class="productinfo-infogroup">
           <p>${{ price }}</p>
-          <p>{{ allergens }}</p>
+          <p class="productinfo-allergens">{{ allergens }}</p>
         </div>
       </div>
 
@@ -60,6 +60,7 @@
 
 <script>
 import axios from 'axios';
+import defaultImage from '@/assets/icons/default-nothing.png';
 
 export default {
   data() {
@@ -68,6 +69,7 @@ export default {
       price: "",
       description: "",
       image: "",
+      defaultImage: defaultImage,
       allergens: "",
       diet: "",
       cartQuantity: 0,
@@ -239,7 +241,9 @@ export default {
         this.showNotification("⚠️ Error al marcar favorito.", "error");
       }
     },
-
+    onProductImageError(event) {
+      event.target.src = this.defaultImage;
+    },
     showNotification(message, type) {
       this.notification.message = message;
       this.notification.type = type;
@@ -375,7 +379,7 @@ export default {
 
 .productinfo-btn-quantity,
 .productinfo-quantity-input {
-    background-color: #D9D9D9;
+    background-color: #F7F7F7;
 }
 
 .productinfo-quantity-input {
@@ -415,11 +419,10 @@ export default {
     font-size: 2rem;
     margin-bottom: 3rem;
     padding: 1rem;
-    background-color: #D9D9D9;
+    background-color: #F7F7F7;
     border-radius: 1rem;
     text-align: center;
 }
-
 /* Grupos de información */
 
 .productinfo-info-group {
@@ -439,7 +442,7 @@ export default {
     width: 10rem;
     margin: 0 5rem;
     padding: 0.5rem;
-    background-color: #D9D9D9;
+    background-color: #F7F7F7;
     border-radius: 0.5rem;
     text-align: center;
     font-size: 1.5rem;
@@ -447,23 +450,33 @@ export default {
 
 .productinfo-infogroup {
     text-align: center;
-    font-size: 1.5rem;
+    font-size: 1.2rem;
+    font-family: "Source Sans 3", sans-serif;
+}
+.productinfo-allergens{
+  max-width: 20rem;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  white-space: pre-wrap;
+  text-align: center;
 }
 
 /* Descripción del producto */
 
 .productinfo-description {
-    width: 40rem;
-    height: 10rem;
-    margin-top: 1rem;
-    padding: 1rem;
-    background-color: #D9D9D9;
-    border-radius: 1rem;
+  width: 40rem;
+  height: 10rem;
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: #F7F7F7;
+  border-radius: 1rem;
+  font-family: "Source Sans 3", sans-serif;
 }
 
 .productinfo-descriptiontitle {
-    margin-top: 0;
-    font-size: 1.5rem;
+  margin-top: 0;
+  font-size: 1.5rem;
+  font-family: "Keania One", sans-serif;
 }
 
 /* Notificaciones */
@@ -510,7 +523,9 @@ export default {
         width: 10rem;
         height: 10rem;
     }
-
+    .productinfo-allergens{
+      max-width: 10rem;
+    }
     .productinfo-btn-favorite {
         width: 100%;
         padding: 0.5rem;

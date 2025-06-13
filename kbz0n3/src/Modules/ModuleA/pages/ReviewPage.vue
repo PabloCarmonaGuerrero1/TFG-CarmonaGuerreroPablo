@@ -1,8 +1,8 @@
 <template>
   <div class="review-container">
     <div class="review-images-leftside">
-      <img :src="images[0]" alt="product-image-left-one" v-if="images[0]">
-      <img :src="images[1]" alt="product-image-left-two" v-if="images[1]">
+      <img :src="images[0]" alt="product-image-left-one" v-if="images[0]" @error="onProductImageError">
+      <img :src="images[1]" alt="product-image-left-two" v-if="images[1]" @error="onProductImageError">
     </div>
 
     <form @submit.prevent="postReview" class="review-form">
@@ -43,8 +43,8 @@
       <router-link to="/reviewdata"><p>Go to Review Database</p></router-link>
     </form>
     <div class="review-images-rightside">
-      <img :src="images[2]" alt="product-image-left-one" v-if="images[2]">
-      <img :src="images[3]" alt="product-image-left-two" v-if="images[3]">
+      <img :src="images[2]" alt="product-image-left-one" v-if="images[2]" @error="onProductImageError">
+      <img :src="images[3]" alt="product-image-left-two" v-if="images[3]" @error="onProductImageError">
     </div>
     <div v-if="notificationMessage" class="notification" :class="notificationType">
       {{ notificationMessage }}
@@ -54,6 +54,7 @@
 
 <script>
 import axios from "axios";
+import defaultImage from '@/assets/icons/default-nothing.png';
 
 export default {
   data() {
@@ -67,6 +68,7 @@ export default {
       errors: {},
       submitDisabled: true,
       images: [],
+      defaultImage: defaultImage,
       notificationMessage: "", 
       notificationType: "", 
     };
@@ -229,6 +231,9 @@ export default {
       } catch (error) {
         console.error("Error:", error);
       }
+    },
+    onProductImageError(event) {
+      event.target.src = this.defaultImage;
     }
   },
   mounted() {

@@ -59,7 +59,10 @@
         </div>
         </div>
         <div class="homepage-product-imagecart">
-          <img :src="product.image" :alt="`Image of ${product.name}`" @click="saveProductName(product.id)" class="homepage-image-product">
+          <img :src="product.image" :alt="`Image of ${product.name}`"
+            @click="saveProductName(product.id)"
+            @error="onProductImageError"
+            class="homepage-image-product">
         </div>
         <p>{{ product.name }}</p>
         <label :for="`quantity-${product.id}`" class="sr-only">Quantity</label>
@@ -81,6 +84,7 @@
 <script>
 import axios from 'axios';
 import Multiselect from 'vue-multiselect';
+import defaultImage from '@/assets/icons/default-nothing.png';
 
 export default {
   components: { Multiselect },
@@ -94,6 +98,7 @@ export default {
         price: 50,
       },
       isLoggedIn: false,
+      defaultImage: defaultImage,
       currentUser: null,
       products: [],
       cart: {}, 
@@ -152,6 +157,9 @@ export default {
     }
   },
   methods: {
+    onProductImageError(event) {
+      event.target.src = this.defaultImage;
+    },
     showNotification(message, type = 'success') {
       const id = Date.now();
       this.notifications.push({ id, message, type });

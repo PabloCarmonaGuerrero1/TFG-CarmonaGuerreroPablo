@@ -6,7 +6,7 @@
         <h3>Food</h3>
         <ul v-if="paginatedFood.length" class="shoppingcart-ul">
           <li v-for="item in paginatedFood" :key="item.id" class="shoppingcart-li">
-            <img :src="item.image" alt="Product-image" class="shoppingcart-product-image" />
+            <img :src="item.image" alt="Product-image" class="shoppingcart-product-image" @error="onImageError"/>
             <div class="shoppingcart-product-info">
               <label :for="'product-' + item.id"><strong>{{ item.product_name || "Loading..." }}</strong></label>
               <p class="product-price">Price: ${{ (item.total_price).toFixed(2) }}</p>
@@ -38,7 +38,7 @@
         <h3>Drinks</h3>
         <ul v-if="paginatedDrinks.length" class="shoppingcart-ul">
           <li v-for="item in paginatedDrinks" :key="item.id" class="shoppingcart-li">
-            <img :src="item.image" alt="Product-image" class="shoppingcart-product-image" />
+            <img :src="item.image" alt="Product-image" class="shoppingcart-product-image" @error="onImageError"/>
             <div class="shoppingcart-product-info">
               <label :for="'product-' + item.id"><strong>{{ item.product_name || "Loading..." }}</strong></label>
               <p class="product-price">Price: ${{ (item.total_price).toFixed(2) }}</p>
@@ -97,6 +97,7 @@
 <script>
 import { ref, onMounted,computed } from "vue";
 import axios from "axios";
+import defaultImage from '@/assets/icons/default-nothing.png';
 
 export default {
   setup() {
@@ -276,6 +277,9 @@ export default {
         drinkPage.value--;
       }
     };
+    const onImageError = (event) => {
+      event.target.src = defaultImage;
+    };
 
     const showNotification = (message, type) => {
       notificationMessage.value = message;
@@ -315,6 +319,7 @@ export default {
       isLastDrinkPage,
       totalFoodPages,
       totalDrinkPages, 
+      onImageError
     };
   },
 };
