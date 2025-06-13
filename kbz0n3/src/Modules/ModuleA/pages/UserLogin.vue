@@ -1,8 +1,8 @@
 <template>
   <div class="Login">
     <div class="login-images-leftside">
-      <img :src="images[0]" alt="product-image-left-one" v-if="images[0]">
-      <img :src="images[1]" alt="product-image-left-two" v-if="images[1]">
+      <img :src="images[0]" alt="product-image-left-one" v-if="images[0]" @error="onProductImageError">
+      <img :src="images[1]" alt="product-image-left-two" v-if="images[1]" @error="onProductImageError">
     </div>
     <form class="Login-form" @submit.prevent="loginUser">
       <h1>WELCOME TO KBZ0N3!</h1>
@@ -30,14 +30,15 @@
       </router-link>
     </form>
     <div class="login-images-rightside">
-      <img :src="images[2]" alt="product-image-right-one" v-if="images[2]">
-      <img :src="images[3]" alt="product-image-right-two" v-if="images[3]">
+      <img :src="images[2]" alt="product-image-right-one" v-if="images[2]" @error="onProductImageError">
+      <img :src="images[3]" alt="product-image-right-two" v-if="images[3]" @error="onProductImageError">
     </div>
   </div>
 </template>
 
 <script>
 import axios from "axios";
+import defaultImage from '@/assets/icons/default-nothing.png';
 
 export default {
   data() {
@@ -45,6 +46,7 @@ export default {
       username: "",
       password: "",
       images: [],
+      defaultImage: defaultImage,
       errors: {
         username: "",
         password: "",
@@ -52,30 +54,26 @@ export default {
     };
   },
   methods: {
-async loginUser() {
-  this.errors.username = "";
-  this.errors.password = "";
+    async loginUser() { 
+      this.errors.username = "";
+      this.errors.password = "";
+      try {
+        const response = await axios.post("http://localhost:8000/api/login", {
+          username: this.username,
+          password: this.password,
+        });
+        const { token} = response.data;
 
-  try {
-    const response = await axios.post("http://localhost:8000/api/login", {
-      username: this.username,
-      password: this.password,
-    });
-
-    const { token} = response.data;
-
-    localStorage.setItem("token", token);
-
-    this.$router.push("/homepage");
-  } catch (error) {
-    if (error.response && error.response.status === 401) {
-      this.errors.password = "Incorrect username or password.";
-    } else {
-      console.error("Login error:", error);
-    }
-  }
-}
-,
+        localStorage.setItem("token", token);
+        this.$router.push("/homepage");
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.errors.password = "Incorrect username or password.";
+        } else {
+          console.error("Login error:", error);
+        }
+      }
+    },
     async getImage() {
       try {
         const apiUrl = `http://localhost:8000/api/product`;
@@ -99,6 +97,9 @@ async loginUser() {
       } catch (error) {
         console.error("Error:", error);
       }
+    },
+    onProductImageError(event) {
+      event.target.src = this.defaultImage;
     }
   },
   mounted() {

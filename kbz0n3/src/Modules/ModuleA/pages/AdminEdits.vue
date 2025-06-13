@@ -433,6 +433,7 @@ export default {
         const message = this.selectedProduct ? "✏️ Product edited" : "✅ Product added";
         const type = this.selectedProduct ? "info" : "success";
         this.showNotification(message, type);
+        this.selectedProduct = null;
       }).catch(error => console.error("Error saving product:", error));
     },
     deleteProduct(productId) {

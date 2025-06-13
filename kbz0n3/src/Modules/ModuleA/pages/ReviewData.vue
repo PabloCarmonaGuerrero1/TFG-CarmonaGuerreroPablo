@@ -175,6 +175,8 @@ body {
   width: 100%;
   text-align: left;
   display: block;
+  font-family: "Source Sans 3", sans-serif;
+  font-size: 1rem;
 }
 
 /* Cabecera de la reseña */

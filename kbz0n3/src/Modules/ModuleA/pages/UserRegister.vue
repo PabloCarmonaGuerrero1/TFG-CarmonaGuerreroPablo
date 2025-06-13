@@ -1,8 +1,8 @@
 <template>
   <div class="Register">
     <div class="register-images-leftside">
-      <img :src="images[0]" alt="product-image-left-one" v-if="images[0]">
-      <img :src="images[1]" alt="product-image-left-two" v-if="images[1]">
+      <img :src="images[0]" alt="product-image-left-one" v-if="images[0]" @error="onProductImageError">
+      <img :src="images[1]" alt="product-image-left-two" v-if="images[1]" @error="onProductImageError">
     </div>
     <form class="Register-form">
       <h1 class="registerpage-title">Register on KBZ0N3</h1>
@@ -50,8 +50,8 @@
       </div>
     </form>
     <div class="register-images-rightside">
-      <img :src="images[2]" alt="product-image-right-one" v-if="images[2]">
-      <img :src="images[3]" alt="product-image-right-two" v-if="images[3]">
+      <img :src="images[2]" alt="product-image-right-one" v-if="images[2]" @error="onProductImageError">
+      <img :src="images[3]" alt="product-image-right-two" v-if="images[3]" @error="onProductImageError">
     </div>
   </div>
 </template>
@@ -59,6 +59,7 @@
 
 <script>
 import axios from 'axios';
+import defaultImage from '@/assets/icons/default-nothing.png';
 
 export default {
   data() {
@@ -70,6 +71,7 @@ export default {
       password: "",
       repeat: "",
       images: [],
+      defaultImage: defaultImage,
       errors: {
         username: "",
         DNI: "",
@@ -214,6 +216,9 @@ export default {
       } catch (error) {
         console.error("Error:", error);
       }
+    },
+    onProductImageError(event) {
+      event.target.src = this.defaultImage;
     }
   },
   mounted() {
