@@ -54,7 +54,7 @@
     methods: {
       async getAllReviews() {
         try {
-          const response = await axios.get(`http://localhost:8000/api/reviews`);
+          const response = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/reviews`);
           if (response.data) {
             this.reviews = response.data.reverse();
           }
@@ -64,7 +64,7 @@
       },
       async searchReviews() {
         try {
-          const response = await axios.get(`http://localhost:8000/api/reviews`, {
+          const response = await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/reviews`, {
             params: {
               name: this.searchName,
               TypeOfReview: this.searchType

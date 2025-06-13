@@ -103,7 +103,7 @@ export default {
         const token = localStorage.getItem("token");
         if (!token) return;
 
-        const response = await fetch("http://localhost:8000/api/me", {
+        const response = await fetch("https://kbz0n3api-despliegue.onrender.com/api/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -131,7 +131,7 @@ export default {
       try {
         const productIds = [this.fav_drink, this.fav_food];
         const requests = productIds
-          .map(id => id !== "nothing" ? axios.get(`http://localhost:8000/api/product/${id}`) : null)
+          .map(id => id !== "nothing" ? axios.get(`https://kbz0n3api-despliegue.onrender.com/api/product/${id}`) : null)
           .filter(req => req !== null);
 
         const responses = await Promise.all(requests);
@@ -190,7 +190,7 @@ export default {
           userData.password = this.password;
         }
 
-        await axios.put(`http://localhost:8000/api/users/${this.id}`, userData);
+        await axios.put(`https://kbz0n3api-despliegue.onrender.com/api/users/${this.id}`, userData);
         this.showNotification("Profile updated successfully", "success");
 
       } catch (error) {
@@ -206,7 +206,7 @@ export default {
           return;
         }
 
-        await axios.get(`http://localhost:8000/api/users/search/${this.username}`);
+        await axios.get(`https://kbz0n3api-despliegue.onrender.com/api/users/search/${this.username}`);
         this.errors.usernameTaken = "Username is already taken";
       } catch (error) {
         if (error.response && error.response.status === 404) {

@@ -42,7 +42,7 @@ export default {
     async checkAdminStatus(){
       const token = localStorage.getItem('token')
       if (!token) return null;
-              const res = await fetch("http://localhost:8000/api/me", {
+              const res = await fetch("https://kbz0n3api-despliegue.onrender.com/api/me", {
             headers: {
                 "Authorization": `Bearer ${token}`
             }

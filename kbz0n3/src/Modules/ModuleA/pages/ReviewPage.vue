@@ -78,10 +78,10 @@ export default {
       if (!this.validateForm()) return;
 
       try {
-        let apiUrl = `http://localhost:8000/api/reviews`;
+        let apiUrl = `https://kbz0n3api-despliegue.onrender.com/api/reviews`;
 
         if (this.typeofreview === "Product") {
-          const productCheckUrl = `http://localhost:8000/api/products/search/?name=${this.productName}`;
+          const productCheckUrl = `https://kbz0n3api-despliegue.onrender.com/api/products/search/?name=${this.productName}`;
           const response = await axios.get(productCheckUrl);
 
           if (!response.data || response.data.length === 0) {
@@ -115,14 +115,14 @@ export default {
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-          const response2 = await fetch("http://localhost:8000/api/me", {
+          const response2 = await fetch("https://kbz0n3api-despliegue.onrender.com/api/me", {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
         const data = await response2.json();
         const username = data.name;
-        const apiUrl = `http://localhost:8000/api/users/search/${username}`;
+        const apiUrl = `https://kbz0n3api-despliegue.onrender.com/api/users/search/${username}`;
         const response = await axios.get(apiUrl);
 
         if (response.data) {
@@ -210,7 +210,7 @@ export default {
     },
     async getImage() {
       try {
-        const apiUrl = `http://localhost:8000/api/product`;
+        const apiUrl = `https://kbz0n3api-despliegue.onrender.com/api/product`;
         const response = await axios.get(apiUrl);
         
         if (response.data && Array.isArray(response.data)) {
